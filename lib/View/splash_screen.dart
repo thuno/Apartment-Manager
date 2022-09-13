@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:project1/View/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -24,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SvgPicture.asset('lib/Assets/Splash screen.svg'),
+        child: Image.asset('lib/Assets/Splash screen.png'),
       ),
     );
   }
