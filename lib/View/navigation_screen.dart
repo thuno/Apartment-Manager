@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:project1/View/home_screen.dart';
+import 'package:project1/View/noti_screen.dart';
 import 'package:project1/View/payment_screen.dart';
 
 class NavigationScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       //set status bar ko màu và các icon có màu tối
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -30,8 +32,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
         switch (currentTab) {
           case 0:
             return const HomeScreen();
-          // case 1:
-          //   return const HomeScreen();
+          case 1:
+            return const NotiScreen();
           case 2:
             return const PaymentScreen();
           default:
