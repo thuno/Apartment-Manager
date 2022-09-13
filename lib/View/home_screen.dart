@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project1/View/bill_detail_screen.dart';
 import 'package:project1/View/bill_history_screen.dart';
+import 'package:project1/View/contact_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -84,57 +85,66 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 84,
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const BillHistoryScreen(),
-                                ));
-                          },
-                          child: Container(
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BillHistoryScreen(),
+                          ));
+                    },
+                    child: SizedBox(
+                      width: 84,
+                      child: Column(
+                        children: [
+                          Container(
                             width: 56,
                             height: 56,
                             margin: const EdgeInsets.only(bottom: 12),
                             child: Image.asset('lib/Assets/calendar.png'),
                           ),
-                        ),
-                        const Text(
-                          'Lịch sử tiền phòng',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 22 / 14,
-                            color: Color(0xFF262626),
-                          ),
-                        )
-                      ],
+                          const Text(
+                            'Lịch sử tiền phòng',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 22 / 14,
+                              color: Color(0xFF262626),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    width: 84,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: Image.asset('lib/Assets/chat.png'),
-                        ),
-                        const Text(
-                          'Liên hệ',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 22 / 14,
-                            color: Color(0xFF262626),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ContactScreen(),
+                          ));
+                    },
+                    child: SizedBox(
+                      width: 84,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            child: Image.asset('lib/Assets/chat.png'),
                           ),
-                        )
-                      ],
+                          const Text(
+                            'Liên hệ',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 22 / 14,
+                              color: Color(0xFF262626),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(
