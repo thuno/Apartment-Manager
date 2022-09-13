@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project1/View/home_screen.dart';
+import 'package:project1/View/navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -100,7 +100,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.bottomCenter,
                     child: InkWell(
                       onTap: () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => const NavigationScreen()));
                       },
                       child: Container(
                         height: 40,

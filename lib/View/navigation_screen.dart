@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/View/home_screen.dart';
+import 'package:project1/View/payment_screen.dart';
+
+class NavigationScreen extends StatefulWidget {
+  const NavigationScreen({super.key});
+
+  @override
+  State<NavigationScreen> createState() => _NavigationScreenState();
+}
+
+class _NavigationScreenState extends State<NavigationScreen> {
+  int currentTab = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      //set status bar ko màu và các icon có màu tối
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        toolbarHeight: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle:
+            const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark, statusBarColor: Colors.transparent),
+      ),
+      body: Builder(builder: (context) {
+        switch (currentTab) {
+          case 0:
+            return const HomeScreen();
+          // case 1:
+          //   return const HomeScreen();
+          case 2:
+            return const PaymentScreen();
+          default:
+            return const HomeScreen();
+        }
+      }),
+      bottomNavigationBar: BottomNavigationBar(
+          onTap: (index) {
+            setState(() {
+              currentTab = index;
+            });
+          },
+          currentIndex: currentTab,
+          items: [
+            BottomNavigationBarItem(
+              icon: Container(
+                width: 20,
+                height: 20,
+                margin: const EdgeInsets.only(bottom: 4),
+                child: SvgPicture.asset(
+                  'lib/Assets/home.svg',
+                  color: currentTab == 0 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
+                ),
+              ),
+              label: 'Trang chủ',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                width: 20,
+                height: 20,
+                margin: const EdgeInsets.only(bottom: 4),
+                child: SvgPicture.asset(
+                  'lib/Assets/bell.svg',
+                  color: currentTab == 1 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
+                ),
+              ),
+              label: 'Thông báo',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                width: 20,
+                height: 20,
+                margin: const EdgeInsets.only(bottom: 4),
+                child: SvgPicture.asset(
+                  'lib/Assets/payment.svg',
+                  color: currentTab == 2 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
+                ),
+              ),
+              label: 'Thanh toán',
+            ),
+          ]),
+    );
+  }
+}

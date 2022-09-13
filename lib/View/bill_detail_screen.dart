@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/View/payment_screen.dart';
 
 class BillDetailsScreen extends StatefulWidget {
   const BillDetailsScreen({super.key});
@@ -116,7 +117,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Chi tiết tiền phòng',
                   style: TextStyle(
                     fontSize: 16,
@@ -267,7 +268,13 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
       ),
       bottomNavigationBar: InkWell(
         onTap: () {
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PaymentScreen(
+                  isPage: false,
+                ),
+              ));
         },
         child: Container(
           height: 40,
