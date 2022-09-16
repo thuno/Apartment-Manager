@@ -5,14 +5,14 @@ import 'package:project1/View/home_screen.dart';
 import 'package:project1/View/noti_screen.dart';
 import 'package:project1/View/payment_screen.dart';
 
-class NavigationScreen extends StatefulWidget {
-  const NavigationScreen({super.key});
+class GuestNavigationScreen extends StatefulWidget {
+  const GuestNavigationScreen({super.key});
 
   @override
-  State<NavigationScreen> createState() => _NavigationScreenState();
+  State<GuestNavigationScreen> createState() => _GuestNavigationScreenState();
 }
 
-class _NavigationScreenState extends State<NavigationScreen> {
+class _GuestNavigationScreenState extends State<GuestNavigationScreen> {
   int currentTab = 0;
 
   @override
