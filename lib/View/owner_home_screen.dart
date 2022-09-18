@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/View/update_cost_screen.dart';
 
 class OwnerHomeScreen extends StatefulWidget {
   const OwnerHomeScreen({super.key});
@@ -171,30 +172,35 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                       ),
                     ),
                     Expanded(
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(top: 8, bottom: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          children: [
-                            SvgPicture.asset('lib/Assets/time.svg'),
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              child: const Text(
-                                'Cập nhật tiền phòng',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  height: 24 / 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF394960),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const UpdateCost()));
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          padding: const EdgeInsets.only(top: 8, bottom: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                          ),
+                          child: Column(
+                            children: [
+                              SvgPicture.asset('lib/Assets/time.svg'),
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                child: const Text(
+                                  'Cập nhật tiền phòng',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    height: 24 / 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF394960),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
