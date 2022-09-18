@@ -10,6 +10,7 @@ class RoomItem {
   int? internet;
   int? otherService;
   int? vehicle;
+  int? status;
 
   RoomItem({
     this.id,
@@ -23,5 +24,6 @@ class RoomItem {
     this.internet,
     this.otherService,
     this.vehicle,
+    this.status,
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/View/payment_status_screen.dart';
 import 'package:project1/View/update_cost_screen.dart';
 
 class OwnerHomeScreen extends StatefulWidget {
@@ -143,31 +144,36 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 16),
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(top: 8, bottom: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          children: [
-                            SvgPicture.asset('lib/Assets/salary.svg'),
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              child: const Text(
-                                'Trạng thái thanh toán',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  height: 24 / 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF394960),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentStatus()));
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 16),
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          padding: const EdgeInsets.only(top: 8, bottom: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                          ),
+                          child: Column(
+                            children: [
+                              SvgPicture.asset('lib/Assets/salary.svg'),
+                              Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                child: const Text(
+                                  'Trạng thái thanh toán',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    height: 24 / 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF394960),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
