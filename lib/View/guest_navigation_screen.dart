@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:project1/View/home_screen.dart';
+import 'package:project1/View/guest_home_screen.dart';
 import 'package:project1/View/noti_screen.dart';
 import 'package:project1/View/payment_screen.dart';
 
@@ -31,13 +31,13 @@ class _GuestNavigationScreenState extends State<GuestNavigationScreen> {
       body: Builder(builder: (context) {
         switch (currentTab) {
           case 0:
-            return const HomeScreen();
+            return const GuestHomeScreen();
           case 1:
             return const NotiScreen();
           case 2:
             return const PaymentScreen();
           default:
-            return const HomeScreen();
+            return const GuestHomeScreen();
         }
       }),
       bottomNavigationBar: BottomNavigationBar(
@@ -47,6 +47,18 @@ class _GuestNavigationScreenState extends State<GuestNavigationScreen> {
             });
           },
           currentIndex: currentTab,
+          selectedLabelStyle: const TextStyle(
+            fontSize: 12,
+            height: 16 / 12,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 12,
+            height: 16 / 12,
+          ),
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedItemColor: const Color(0xFF366AE2),
+          unselectedItemColor: const Color(0xFFBFBFBF),
           items: [
             BottomNavigationBarItem(
               icon: Container(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project1/View/navigation_screen_guest.dart';
+import 'package:project1/View/guest_navigation_screen.dart';
+import 'package:project1/View/owner_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -101,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: InkWell(
                       onTap: () {
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => const GuestNavigationScreen()));
+                            context, MaterialPageRoute(builder: (context) => const OwnerNavigationScreen()));
                       },
                       child: Container(
                         height: 40,

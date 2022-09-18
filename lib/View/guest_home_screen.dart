@@ -3,14 +3,14 @@ import 'package:project1/View/bill_detail_screen.dart';
 import 'package:project1/View/bill_history_screen.dart';
 import 'package:project1/View/contact_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class GuestHomeScreen extends StatefulWidget {
+  const GuestHomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<GuestHomeScreen> createState() => _GuestHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _GuestHomeScreenState extends State<GuestHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
