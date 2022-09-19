@@ -10,7 +10,7 @@ class NotiScreen extends StatefulWidget {
 }
 
 class _NotiScreenState extends State<NotiScreen> {
-  List<NotifyItem> notifyList = [];
+  List<NotifyItem> notifyList = [NotifyItem()];
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +100,7 @@ class _NotiScreenState extends State<NotiScreen> {
                   ...List.generate(2, (index) {
                     return Container(
                       padding: const EdgeInsets.all(16),
+                      color: const Color(0xFFEDF2FD),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

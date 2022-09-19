@@ -12,7 +12,8 @@ class OwnerNavigationScreen extends StatefulWidget {
 }
 
 class _OwnerNavigationScreenState extends State<OwnerNavigationScreen> {
-  int currentTab = 1;
+  // tab mặc định khi nhảy vào màn hình navigate
+  int currentTab = 0;
 
   @override
   Widget build(BuildContext context) {
