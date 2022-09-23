@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/View/list_message_screen.dart';
 import 'package:project1/View/manage_house_screen.dart';
 import 'package:project1/View/owner_home_screen.dart';
 
@@ -29,7 +30,7 @@ class _OwnerNavigationScreenState extends State<OwnerNavigationScreen> {
               case 2:
                 return Container();
               case 3:
-                return Container();
+                return const ListMessage();
               default:
                 return const OwnerHomeScreen();
             }
