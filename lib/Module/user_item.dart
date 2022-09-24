@@ -5,4 +5,8 @@ class UserItem {
   int? role;
 
   UserItem({this.id, this.name, this.avatar, this.role});
+
+  Map<String, dynamic> toJson() {
+    return {};
+  }
 }

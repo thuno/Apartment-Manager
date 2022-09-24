@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project1/Module/user_item.dart';
 import 'package:project1/View/guest_navigation_screen.dart';
 import 'package:project1/View/owner_navigation_screen.dart';
 
@@ -100,7 +104,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: InkWell(
-                      onTap: () {
+                      onTap: () async {
+                        // var x = await FirebaseFirestore.instance.collection('Admin').add({
+                        //   'one': 1,
+                        //   'lalala': '37244823',
+                        // });
+                        // print(x);
                         Navigator.pushReplacement(
                             context, MaterialPageRoute(builder: (context) => const OwnerNavigationScreen()));
                       },
