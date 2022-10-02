@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:project1/Module/room_item.dart';
 
 class PaymentStatus extends StatefulWidget {
   const PaymentStatus({super.key});
@@ -10,6 +12,7 @@ class PaymentStatus extends StatefulWidget {
 }
 
 class _PaymentStatusState extends State<PaymentStatus> {
+  final oCcy = NumberFormat("#,##0", "en_US");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +67,7 @@ class _PaymentStatusState extends State<PaymentStatus> {
         padding: const EdgeInsets.all(16),
         child: ListView.separated(
           physics: const BouncingScrollPhysics(),
-          itemCount: 6,
+          itemCount: RoomDA.listRoom.length,
           itemBuilder: (context, index) {
             return Container(
               padding: const EdgeInsets.fromLTRB(16, 16, 0, 16),
@@ -83,10 +86,10 @@ class _PaymentStatusState extends State<PaymentStatus> {
                         ),
                         child: Image.asset('lib/Assets/Image demo.png'),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Phòng 101',
-                          style: TextStyle(
+                          'Phòng ${RoomDA.listRoom[index].name}',
+                          style: const TextStyle(
                             fontSize: 16,
                             height: 22 / 16,
                             fontWeight: FontWeight.w700,
@@ -108,7 +111,7 @@ class _PaymentStatusState extends State<PaymentStatus> {
                             Transform.scale(
                               scale: 28 / 32,
                               child: Checkbox(
-                                value: false,
+                                value: RoomDA.listRoom[index].payementStatus,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),
@@ -129,9 +132,9 @@ class _PaymentStatusState extends State<PaymentStatus> {
                           margin: const EdgeInsets.only(right: 12),
                           child: SvgPicture.asset('lib/Assets/user-multiple.svg'),
                         ),
-                        const Text(
-                          'Số người: 3',
-                          style: TextStyle(
+                        Text(
+                          'Số người: ${RoomDA.listRoom[index].numberUser}',
+                          style: const TextStyle(
                             fontSize: 14,
                             height: 22 / 14,
                             color: Color(0xFF262626),
@@ -152,9 +155,9 @@ class _PaymentStatusState extends State<PaymentStatus> {
                         ),
                       ),
                       RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: 'Số tiền: ',
                               style: TextStyle(
                                 fontSize: 14,
@@ -163,14 +166,14 @@ class _PaymentStatusState extends State<PaymentStatus> {
                               ),
                             ),
                             TextSpan(
-                              text: '6,850,000',
-                              style: TextStyle(
+                              text: oCcy.format(RoomDA.listRoom[index].totalBill),
+                              style: const TextStyle(
                                 fontSize: 14,
                                 height: 22 / 14,
                                 color: Color(0xFF2EB553),
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: ' VNĐ',
                               style: TextStyle(
                                 fontSize: 14,

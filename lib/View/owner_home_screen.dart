@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:project1/Module/income_item.dart';
+import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/payment_status_screen.dart';
 import 'package:project1/View/update_cost_screen.dart';
 
@@ -12,35 +17,112 @@ class OwnerHomeScreen extends StatefulWidget {
 }
 
 class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
+  final oCcy = NumberFormat("#,##0", "en_US");
   final ScrollController scrollController = ScrollController();
+  List<RoomItem> listRoomPaid = [];
+  IncomeItem? incomeLastMonth;
+
+  String convertNumber(int number) {
+    if (number < 10) {
+      return '0$number';
+    } else {
+      return '$number';
+    }
+  }
+
+  String convertWeekDay(int number) {
+    String value = '';
+    switch (number) {
+      case 1:
+        value = 'Thứ 2';
+        break;
+      case 2:
+        value = 'Thứ 3';
+        break;
+      case 3:
+        value = 'Thứ 4';
+        break;
+      case 4:
+        value = 'Thứ 5';
+        break;
+      case 5:
+        value = 'Thứ 6';
+        break;
+      case 6:
+        value = 'Thứ 7';
+        break;
+      case 7:
+        value = 'Chủ nhật';
+        break;
+      default:
+        break;
+    }
+    return value;
+  }
+
+  final Stream<DateTime> _now = (() {
+    late final StreamController<DateTime> controller;
+    controller = StreamController<DateTime>(
+      sync: true,
+      onListen: () async {
+        Future<void> listenTimeChage() async {
+          await Future<void>.delayed(const Duration(seconds: 1));
+          controller.add(DateTime.now());
+          listenTimeChage();
+        }
+
+        await listenTimeChage();
+      },
+    );
+    return controller.stream;
+  })();
+
+  Future<void> getIncomeHistory() async {
+    await IncomeDA.getHistory();
+    setState(() {
+      incomeLastMonth = IncomeDA.history.last;
+    });
+  }
+
+  @override
+  void initState() {
+    getIncomeHistory();
+    listRoomPaid = RoomDA.listRoom.where((e) => e.payementStatus ?? false).toList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    int? totalIncome;
+    if (incomeLastMonth != null) {
+      totalIncome =
+          (incomeLastMonth!.electric! + incomeLastMonth!.water! + incomeLastMonth!.room! + incomeLastMonth!.service!);
+    }
     var listIncomeType = [
       {
-        "money": '136.000.000',
-        "title": 'Tổng doanh thu tháng 7',
+        "money": oCcy.format(totalIncome ?? 0),
+        "title": 'Tổng doanh thu ${incomeLastMonth?.name ?? ("tháng ${DateTime.now().month})}")}',
         "percent": '100%',
       },
       {
-        "money": '80.000.000',
+        "money": oCcy.format(incomeLastMonth?.room ?? 0),
         "title": 'Tiền phòng',
-        "percent": '70%',
+        "percent": '${((incomeLastMonth?.room ?? 0) * 100 / (totalIncome ?? 1)).round()}%',
       },
       {
-        "money": '30.000.000',
+        "money": oCcy.format(incomeLastMonth?.electric ?? 0),
         "title": 'Tiền điện',
-        "percent": '15%',
+        "percent": '${((incomeLastMonth?.electric ?? 0) * 100 / (totalIncome ?? 1)).round()}%',
       },
       {
-        "money": '10.000.000',
+        "money": oCcy.format(incomeLastMonth?.water ?? 0),
         "title": 'Tiền nước',
-        "percent": '10%',
+        "percent": '${((incomeLastMonth?.water ?? 0) * 100 / (totalIncome ?? 1)).round()}%',
       },
       {
-        "money": '8.000.000',
+        "money": oCcy.format(incomeLastMonth?.service ?? 0),
         "title": 'Phí dịch vụ khác',
-        "percent": '7%',
+        "percent": '${((incomeLastMonth?.service ?? 0) * 100 / (totalIncome ?? 1)).round()}%',
       },
     ];
     return Scaffold(
@@ -130,10 +212,32 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                 ),
               ),
             ),
-            const Positioned(
+            Positioned(
               top: 124,
               right: 20,
-              child: Oclock(),
+              child: StreamBuilder(
+                initialData: DateTime.now(),
+                stream: _now,
+                builder: (context, snapshot) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${convertNumber(snapshot.data!.hour)}:${convertNumber(snapshot.data!.minute)}:${convertNumber(snapshot.data!.second)}',
+                        style: const TextStyle(
+                            fontSize: 38, height: 48 / 38, fontWeight: FontWeight.w700, color: Colors.white),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          '${convertWeekDay(snapshot.data!.weekday)},${convertNumber(snapshot.data!.day)}/${convertNumber(snapshot.data!.month)}/${snapshot.data!.year}',
+                          style: const TextStyle(fontSize: 12, height: 16 / 12, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
             Positioned(
               top: 220,
@@ -238,17 +342,21 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     children: [
                       Transform.scale(
                         scale: 0.7,
-                        child: const CircularProgressIndicator(
-                          backgroundColor: Color(0xFFFAF1EE),
-                          color: Color(0xFFF94033),
+                        child: CircularProgressIndicator(
+                          backgroundColor: (listRoomPaid.length / RoomDA.listRoom.length) > 0.9
+                              ? const Color(0xFF84ED9C)
+                              : const Color(0xFFFCF2EF),
+                          color: (listRoomPaid.length / RoomDA.listRoom.length) > 0.9
+                              ? const Color(0xFF33BC58)
+                              : const Color(0xFFF94033),
                           strokeWidth: 40,
-                          value: 12 / 20,
+                          value: listRoomPaid.length / RoomDA.listRoom.length,
                         ),
                       ),
-                      const Center(
+                      Center(
                         child: Text(
-                          '12/20',
-                          style: TextStyle(
+                          '${listRoomPaid.length}/${RoomDA.listRoom.length}',
+                          style: const TextStyle(
                             fontSize: 22,
                             height: 28 / 22,
                             fontWeight: FontWeight.w500,
@@ -271,9 +379,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     ),
                   ),
                 ),
-                const Text(
-                  'Tính đến ngày 07/08/2022',
-                  style: TextStyle(
+                Text(
+                  'Tính đến ngày ${convertNumber(DateTime.now().day)}/${convertNumber(DateTime.now().month)}/${DateTime.now().year}',
+                  style: const TextStyle(
                     fontSize: 14,
                     height: 22 / 14,
                     color: Color(0xFF595959),
@@ -373,95 +481,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
           )
         ],
       ),
-    );
-  }
-}
-
-class Oclock extends StatefulWidget {
-  const Oclock({super.key});
-
-  @override
-  State<Oclock> createState() => _OclockState();
-}
-
-class _OclockState extends State<Oclock> {
-  DateTime _now = DateTime.now();
-
-  @override
-  void setState(VoidCallback fn) {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _now = DateTime.now();
-        });
-      }
-    });
-    super.setState(fn);
-  }
-
-  @override
-  void initState() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _now = DateTime.now();
-        });
-      }
-    });
-    super.initState();
-  }
-
-  String convertWeekDay(int number) {
-    String value = '';
-    switch (number) {
-      case 1:
-        value = 'Thứ 2';
-        break;
-      case 2:
-        value = 'Thứ 3';
-        break;
-      case 3:
-        value = 'Thứ 4';
-        break;
-      case 4:
-        value = 'Thứ 5';
-        break;
-      case 5:
-        value = 'Thứ 6';
-        break;
-      case 6:
-        value = 'Thứ 7';
-        break;
-      case 7:
-        value = 'Chủ nhật';
-        break;
-      default:
-        break;
-    }
-    return value;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${_now.hour}:${_now.minute}:${_now.second}',
-              style: const TextStyle(fontSize: 38, height: 48 / 38, fontWeight: FontWeight.w700, color: Colors.white),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 4),
-              child: Text(
-                '${convertWeekDay(_now.weekday)},${_now.day}/${_now.month}/${_now.year}',
-                style: const TextStyle(fontSize: 12, height: 16 / 12, color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }
