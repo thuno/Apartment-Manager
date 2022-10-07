@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/room_infor_screen.dart';
+import 'package:project1/View/update_cost_screen.dart';
 
 class MangeHouse extends StatefulWidget {
   const MangeHouse({super.key});
@@ -11,6 +14,7 @@ class MangeHouse extends StatefulWidget {
 }
 
 class _MangeHouseState extends State<MangeHouse> {
+  final oCcy = NumberFormat("#,##0", "en_US");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,13 +35,28 @@ class _MangeHouseState extends State<MangeHouse> {
             color: Color(0xFF262626),
           ),
         ),
+        leading: Container(
+          height: double.infinity,
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top: 12),
+          child: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Icon(
+              Icons.chevron_left,
+              size: 24,
+              color: Color(0xFF4B6281),
+            ),
+          ),
+        ),
       ),
       body: Container(
         color: const Color(0xFFF2F5F8),
         padding: const EdgeInsets.all(16),
         child: ListView.separated(
           physics: const BouncingScrollPhysics(),
-          itemCount: 6,
+          itemCount: RoomDA.listRoom.length,
           itemBuilder: (context, index) {
             return Container(
               padding: const EdgeInsets.all(16),
@@ -60,9 +79,9 @@ class _MangeHouseState extends State<MangeHouse> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Phòng 101',
-                              style: TextStyle(
+                            Text(
+                              RoomDA.listRoom[index].name!,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 height: 24 / 16,
                                 fontWeight: FontWeight.w700,
@@ -71,9 +90,11 @@ class _MangeHouseState extends State<MangeHouse> {
                             ),
                             Container(
                               margin: const EdgeInsets.only(top: 4),
-                              child: const Text(
-                                'Bắt đầu thuê từ: 20/01/2020',
-                                style: TextStyle(
+                              child: Text(
+                                RoomDA.listRoom[index].dateStart == null
+                                    ? "Phòng trống"
+                                    : 'Bắt đầu thuê từ: ${RoomDA.listRoom[index].dateStart}',
+                                style: const TextStyle(
                                   fontSize: 14,
                                   height: 22 / 14,
                                   color: Color(0xFF8C8C8C),
@@ -86,27 +107,15 @@ class _MangeHouseState extends State<MangeHouse> {
                     ],
                   ),
                   Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: const Text(
-                      'Tiền phòng tháng 8/2022',
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 24 / 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1C2430),
-                      ),
-                    ),
-                  ),
-                  Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       children: [
                         SvgPicture.asset('lib/Assets/user-multiple.svg'),
                         Container(
                           margin: const EdgeInsets.only(left: 12),
-                          child: const Text(
-                            'Số người: 3',
-                            style: TextStyle(
+                          child: Text(
+                            'Số người: ${RoomDA.listRoom[index].numberUser}',
+                            style: const TextStyle(
                               fontSize: 14,
                               height: 22 / 14,
                               color: Color(0xFF262626),
@@ -124,9 +133,9 @@ class _MangeHouseState extends State<MangeHouse> {
                         SvgPicture.asset('lib/Assets/deposit.svg'),
                         Container(
                           margin: const EdgeInsets.only(left: 12),
-                          child: const Text(
-                            'Tiền cọc: 3,000,000 VNĐ',
-                            style: TextStyle(
+                          child: Text(
+                            'Tiền cọc: ${oCcy.format(RoomDA.listRoom[index].deposit ?? 0)} VNĐ',
+                            style: const TextStyle(
                               fontSize: 14,
                               height: 22 / 14,
                               color: Color(0xFF262626),
@@ -137,8 +146,14 @@ class _MangeHouseState extends State<MangeHouse> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const RoomInfor()));
+                    onTap: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RoomInfor(
+                                    roomItem: RoomDA.listRoom[index],
+                                  )));
+                      setState(() {});
                     },
                     child: Container(
                       width: double.infinity,
@@ -165,6 +180,30 @@ class _MangeHouseState extends State<MangeHouse> {
           separatorBuilder: (context, index) {
             return const SizedBox(height: 16);
           },
+        ),
+      ),
+      bottomNavigationBar: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UpdateCost(),
+              ));
+        },
+        child: Container(
+          height: 40,
+          width: double.infinity,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF366AE2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Text(
+            'Cập nhật tiền phòng',
+            style: TextStyle(fontSize: 14, height: 22 / 14, color: Colors.white),
+          ),
         ),
       ),
     );

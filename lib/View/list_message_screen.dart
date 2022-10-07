@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/contact_screen.dart';
 
 class ListMessage extends StatefulWidget {
@@ -36,7 +37,7 @@ class _ListMessageState extends State<ListMessage> {
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
           physics: const BouncingScrollPhysics(),
-          itemCount: 6,
+          itemCount: RoomDA.listRoom.length,
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
@@ -68,9 +69,9 @@ class _ListMessageState extends State<ListMessage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Phòng 101',
-                            style: TextStyle(
+                          Text(
+                            'Phòng ${RoomDA.listRoom[index].name}',
+                            style: const TextStyle(
                               fontSize: 16,
                               height: 24 / 16,
                               fontWeight: FontWeight.w700,
@@ -80,7 +81,7 @@ class _ListMessageState extends State<ListMessage> {
                           Container(
                             margin: const EdgeInsets.only(top: 4),
                             child: const Text(
-                              'Anh ơi em cần hỗ trợ',
+                              'tin nhắn mới',
                               style: TextStyle(
                                 fontSize: 14,
                                 height: 22 / 14,

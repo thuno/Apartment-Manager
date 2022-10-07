@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:project1/View/list_message_screen.dart';
-import 'package:project1/View/manage_house_screen.dart';
 import 'package:project1/View/owner_home_screen.dart';
 
 class OwnerNavigationScreen extends StatefulWidget {
@@ -26,10 +24,8 @@ class _OwnerNavigationScreenState extends State<OwnerNavigationScreen> {
               case 0:
                 return const OwnerHomeScreen();
               case 1:
-                return const MangeHouse();
-              case 2:
                 return Container();
-              case 3:
+              case 2:
                 return const ListMessage();
               default:
                 return const OwnerHomeScreen();
@@ -76,20 +72,8 @@ class _OwnerNavigationScreenState extends State<OwnerNavigationScreen> {
                     width: 20,
                     height: 20,
                     child: SvgPicture.asset(
-                      'lib/Assets/chart-pie.svg',
-                      color: currentTab == 1 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
-                    ),
-                  ),
-                  label: 'Quản lý nhà',
-                ),
-                BottomNavigationBarItem(
-                  icon: Container(
-                    margin: const EdgeInsets.only(bottom: 4),
-                    width: 20,
-                    height: 20,
-                    child: SvgPicture.asset(
                       'lib/Assets/coins.svg',
-                      color: currentTab == 2 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
+                      color: currentTab == 1 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
                     ),
                   ),
                   label: 'Doanh thu',

@@ -14,7 +14,7 @@ class UpdateCost extends StatefulWidget {
   State<UpdateCost> createState() => _UpdateCostState();
 }
 
-class _UpdateCostState extends State<UpdateCost> {
+class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
   final oCcy = NumberFormat("#,##0 (VNĐ)", "en_US");
   final TextEditingController editRoomCost = TextEditingController();
   final TextEditingController editOldElectric = TextEditingController();
@@ -28,7 +28,9 @@ class _UpdateCostState extends State<UpdateCost> {
   final TextEditingController editInternet = TextEditingController();
   final TextEditingController editOtherService = TextEditingController();
   final TextEditingController editVehicle = TextEditingController();
+  late AnimationController controller;
   int totalCost = 0;
+  bool isSaving = false;
 
   int currentIndex = 0;
 
@@ -73,7 +75,22 @@ class _UpdateCostState extends State<UpdateCost> {
     } else {
       selectRoom();
     }
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..addListener(() {
+        if (mounted && isSaving) {
+          setState(() {});
+        }
+      });
+    controller.repeat();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -646,8 +663,8 @@ class _UpdateCostState extends State<UpdateCost> {
                         onFocusChange: (value) {
                           if (value) {
                             editInternet.selection = TextSelection(
-                                baseOffset: editRoomCost.text.replaceAll(" (VNĐ)", "").length,
-                                extentOffset: editRoomCost.text.replaceAll(" (VNĐ)", "").length);
+                                baseOffset: editInternet.text.replaceAll(" (VNĐ)", "").length,
+                                extentOffset: editInternet.text.replaceAll(" (VNĐ)", "").length);
                           } else {
                             var newValue = formatMoney(editInternet.text);
                             setState(() {
@@ -700,8 +717,8 @@ class _UpdateCostState extends State<UpdateCost> {
                         onFocusChange: (value) {
                           if (value) {
                             editOtherService.selection = TextSelection(
-                                baseOffset: editRoomCost.text.replaceAll(" (VNĐ)", "").length,
-                                extentOffset: editRoomCost.text.replaceAll(" (VNĐ)", "").length);
+                                baseOffset: editOtherService.text.replaceAll(" (VNĐ)", "").length,
+                                extentOffset: editOtherService.text.replaceAll(" (VNĐ)", "").length);
                           } else {
                             var newValue = formatMoney(editOtherService.text);
                             setState(() {
@@ -754,8 +771,8 @@ class _UpdateCostState extends State<UpdateCost> {
                         onFocusChange: (value) {
                           if (value) {
                             editVehicle.selection = TextSelection(
-                                baseOffset: editRoomCost.text.replaceAll(" (VNĐ)", "").length,
-                                extentOffset: editRoomCost.text.replaceAll(" (VNĐ)", "").length);
+                                baseOffset: editVehicle.text.replaceAll(" (VNĐ)", "").length,
+                                extentOffset: editVehicle.text.replaceAll(" (VNĐ)", "").length);
                           } else {
                             var newValue = formatMoney(editVehicle.text);
                             setState(() {
@@ -825,7 +842,7 @@ class _UpdateCostState extends State<UpdateCost> {
                       ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: isSaving ? null : () {},
                       child: Container(
                         height: 40,
                         width: double.infinity,
@@ -835,10 +852,22 @@ class _UpdateCostState extends State<UpdateCost> {
                           color: const Color(0xFF366AE2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text(
-                          'Lưu và tiếp tục',
-                          style: TextStyle(fontSize: 14, height: 22 / 14, color: Colors.white),
-                        ),
+                        child: isSaving
+                            ? SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: CircularProgressIndicator(
+                                    value: controller.value,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                'Lưu và tiếp tục',
+                                style: TextStyle(fontSize: 14, height: 22 / 14, color: Colors.white),
+                              ),
                       ),
                     )
                   ],

@@ -6,8 +6,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:project1/Module/income_item.dart';
 import 'package:project1/Module/room_item.dart';
+import 'package:project1/View/manage_house_screen.dart';
 import 'package:project1/View/payment_status_screen.dart';
-import 'package:project1/View/update_cost_screen.dart';
 
 class OwnerHomeScreen extends StatefulWidget {
   const OwnerHomeScreen({super.key});
@@ -284,7 +284,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const UpdateCost()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const MangeHouse()));
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -300,7 +300,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                               Container(
                                 margin: const EdgeInsets.only(top: 8),
                                 child: const Text(
-                                  'Cập nhật tiền phòng',
+                                  'Thông tin phòng trọ',
                                   style: TextStyle(
                                     fontSize: 16,
                                     height: 24 / 16,

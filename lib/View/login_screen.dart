@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project1/Module/room_item.dart';
 import 'package:project1/Module/user_item.dart';
@@ -31,10 +30,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       vsync: this,
       duration: const Duration(seconds: 1),
     )..addListener(() {
-        setState(() {});
+        if (mounted && isLoading) {
+          setState(() {});
+        }
       });
     controller.repeat();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -221,9 +228,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: isLoading
-                        ? CircularProgressIndicator(
-                            value: controller.value,
-                            color: Colors.white,
+                        ? SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: CircularProgressIndicator(
+                                value: controller.value,
+                                color: Colors.white,
+                              ),
+                            ),
                           )
                         : const Text(
                             'Đăng nhập',

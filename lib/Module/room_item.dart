@@ -16,6 +16,9 @@ class RoomItem {
   int? otherService;
   int? vehicle;
   bool? payementStatus;
+  int? deposit;
+  String? dateStart;
+  String? guestId;
   late int totalBill;
 
   RoomItem({
@@ -34,6 +37,7 @@ class RoomItem {
     this.otherService,
     this.vehicle,
     this.payementStatus,
+    this.guestId,
   }) {
     totalBill = roomCost! +
         electricity! * (newElectricNumber! - oldElectricNumber!) +
@@ -45,6 +49,7 @@ class RoomItem {
 
   static RoomItem fromJson(Map<String, dynamic> json) {
     return RoomItem(
+      id: json['ID'],
       name: json['Name'],
       numberUser: json['NumberUser'] ?? 0,
       password: json['Password'],
@@ -59,6 +64,7 @@ class RoomItem {
       otherService: json['OtherService'],
       vehicle: json['Vehicle'],
       payementStatus: json['PayementStatus'] ?? false,
+      guestId: json['GuestID'],
     );
   }
 
@@ -78,6 +84,7 @@ class RoomItem {
       'OtherService': otherService,
       'Vehicle': vehicle,
       'PayementStatus': payementStatus,
+      'GuestID': guestId,
     };
   }
 }

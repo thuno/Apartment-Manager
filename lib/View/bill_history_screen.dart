@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:project1/Module/bill_item.dart';
 import 'package:project1/View/bill_detail_screen.dart';
 
 class BillHistoryScreen extends StatefulWidget {
@@ -12,7 +11,7 @@ class BillHistoryScreen extends StatefulWidget {
 }
 
 class _BillHistoryScreenState extends State<BillHistoryScreen> {
-  List<BillItem> listBll = [];
+  List listBll = [];
 
   @override
   Widget build(BuildContext context) {
