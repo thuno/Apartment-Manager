@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:project1/Firebase/database_store.dart';
 import 'package:project1/Module/guest_infor_item.dart';
 import 'package:project1/Module/room_item.dart';
+import 'package:project1/Module/user_item.dart';
 
 class RoomInfor extends StatefulWidget {
   final RoomItem? roomItem;
@@ -150,6 +151,13 @@ class _RoomInforState extends State<RoomInfor> {
                 ? CommonInforTab(
                     roomItem: widget.roomItem,
                     guestInfor: guestInfor,
+                    resetData: () {
+                      setState(() {
+                        guestInfor = GuestInforItem(
+                          photos: [],
+                        );
+                      });
+                    },
                   )
                 : LeaseTab(
                     guestInfor: guestInfor,
@@ -163,7 +171,8 @@ class _RoomInforState extends State<RoomInfor> {
 class CommonInforTab extends StatefulWidget {
   final RoomItem? roomItem;
   final GuestInforItem? guestInfor;
-  const CommonInforTab({super.key, this.roomItem, this.guestInfor});
+  final Function? resetData;
+  const CommonInforTab({super.key, this.roomItem, this.guestInfor, this.resetData});
 
   @override
   State<CommonInforTab> createState() => _CommonInforTabState();
@@ -178,11 +187,20 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
   final TextEditingController deposit = TextEditingController();
   final TextEditingController numberUser = TextEditingController();
   final TextEditingController startDate = TextEditingController();
-  late AnimationController controller;
+  AnimationController? controller;
   bool isSaving = false;
 
   Future<void> saveGuestInfor() async {
     setState(() {
+      controller = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 1),
+      )..addListener(() {
+          if (mounted && isSaving) {
+            setState(() {});
+          }
+        });
+      controller!.repeat();
       isSaving = true;
     });
     if (widget.guestInfor?.id != null) {
@@ -190,7 +208,7 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
     } else {
       await GuestInforDA.addInfor(widget.guestInfor!);
     }
-    for (var path in widget.guestInfor!.photos!) {
+    for (var path in widget.guestInfor!.photos!.where((e) => !e.contains(widget.roomItem!.name!))) {
       await FireBaseDA.putFile(path, folder: widget.roomItem!.name);
     }
     if (widget.guestInfor?.contractPhoto != null) {
@@ -203,6 +221,8 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
     await RoomDA.editRoom(widget.roomItem!).then((value) {
       setState(() {
         isSaving = false;
+        RoomInfor.isChange = false;
+        controller?.removeListener(() {});
       });
     });
   }
@@ -216,15 +236,7 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
     deposit.text = oCcy.format(widget.roomItem?.deposit ?? 0);
     numberUser.text = widget.roomItem?.numberUser?.toString() ?? '0';
     startDate.text = widget.roomItem?.dateStart ?? '';
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..addListener(() {
-        if (mounted && isSaving) {
-          setState(() {});
-        }
-      });
-    controller.repeat();
+
     super.initState();
   }
 
@@ -244,7 +256,7 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
 
   @override
   void dispose() {
-    controller.dispose();
+    controller?.dispose();
     super.dispose();
   }
 
@@ -262,7 +274,14 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
                 children: [
                   Expanded(
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        UserItem roomAccount = UserDA.listAccount
+                            .firstWhere((e) => e.roomId == widget.roomItem?.id, orElse: () => UserItem());
+                        if (roomAccount.password != null && roomAccount.password != roomAccount.accName) {
+                          roomAccount.password = roomAccount.accName;
+                          UserDA.editUser(roomAccount);
+                        }
+                      },
                       child: DottedBorder(
                         color: const Color(0xFF1890FF),
                         radius: const Radius.circular(8),
@@ -296,7 +315,15 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
                   const SizedBox(width: 8),
                   Expanded(
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        if (widget.roomItem?.guestId != null) {
+                          widget.roomItem!.guestId = null;
+                          await RoomDA.editRoom(widget.roomItem!);
+                          await GuestInforDA.deleteInfor(widget.roomItem!.guestId!);
+                          await FireBaseDA.deleteFile(widget.roomItem!.name);
+                          widget.resetData!();
+                        }
+                      },
                       child: DottedBorder(
                         color: const Color(0xFF1890FF),
                         radius: const Radius.circular(8),
@@ -753,7 +780,7 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
                         child: FittedBox(
                           fit: BoxFit.contain,
                           child: CircularProgressIndicator(
-                            value: controller.value,
+                            value: controller!.value,
                             color: Colors.white,
                           ),
                         ),

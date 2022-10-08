@@ -21,26 +21,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   String roomError = '';
   String passError = '';
   bool isLoading = false;
-  late AnimationController controller;
+  AnimationController? controller;
 
   @override
   void initState() {
     UserDA.getListAccount();
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..addListener(() {
-        if (mounted && isLoading) {
-          setState(() {});
-        }
-      });
-    controller.repeat();
+
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    controller?.dispose();
     super.dispose();
   }
 
@@ -198,22 +190,32 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             } else {
                               setState(() {
                                 isLoading = true;
+                                controller = AnimationController(
+                                  vsync: this,
+                                  duration: const Duration(seconds: 1),
+                                )..addListener(() {
+                                    if (mounted && isLoading) {
+                                      setState(() {});
+                                    }
+                                  });
+                                controller!.repeat();
                               });
                               if (user.role == 1) {
-                                RoomDA.getRoomAccount(user.id!);
+                                RoomDA.getRoomAccount(user.roomId!);
                               }
                               SharedPreferences store = await _prefs;
                               await store.setString('timer', DateTime.now().toString());
-                              await store.setString('userID', user.id!);
-                              await RoomDA.getListRoom();
-                              // ignore: use_build_context_synchronously
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                                if (user.role == 0) {
-                                  return const OwnerNavigationScreen();
-                                } else {
-                                  return const GuestNavigationScreen();
-                                }
-                              }));
+                              await store.setString('userID', user.roomId!);
+                              await RoomDA.getListRoom().then(
+                                (value) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                                  if (user.role == 0) {
+                                    return const OwnerNavigationScreen();
+                                  } else {
+                                    return const GuestNavigationScreen();
+                                  }
+                                })),
+                              );
+                              controller?.removeListener(() {});
                             }
                           }
                         },
@@ -234,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             child: FittedBox(
                               fit: BoxFit.contain,
                               child: CircularProgressIndicator(
-                                value: controller.value,
+                                value: controller!.value,
                                 color: Colors.white,
                               ),
                             ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/room_infor_screen.dart';
 import 'package:project1/View/update_cost_screen.dart';
+
+import '../Module/user_item.dart';
 
 class MangeHouse extends StatefulWidget {
   const MangeHouse({super.key});
@@ -15,6 +18,7 @@ class MangeHouse extends StatefulWidget {
 
 class _MangeHouseState extends State<MangeHouse> {
   final oCcy = NumberFormat("#,##0", "en_US");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +54,31 @@ class _MangeHouseState extends State<MangeHouse> {
             ),
           ),
         ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return const DialogCreateRoom();
+                  },
+                );
+                setState(() {});
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: const Icon(
+                  Icons.add,
+                  color: Color(0xFF4B6281),
+                  size: 22,
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: Container(
         color: const Color(0xFFF2F5F8),
@@ -65,6 +94,7 @@ class _MangeHouseState extends State<MangeHouse> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         width: 40,
@@ -102,6 +132,131 @@ class _MangeHouseState extends State<MangeHouse> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          await showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) {
+                              return DialogCreateRoom(
+                                isAdd: false,
+                                roomItem: RoomDA.listRoom[index],
+                              );
+                            },
+                          );
+                          setState(() {});
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          child: const Icon(Icons.mode_edit_outlined, color: Color(0xFF1890FF)),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      InkWell(
+                        onTap: () async {
+                          await showCupertinoDialog(
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                insetPadding: EdgeInsets.zero,
+                                backgroundColor: Colors.transparent,
+                                child: IntrinsicHeight(
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                                          child: Text(
+                                            'Bạn có chắc chắn muốn xóa thông tin phòng ${RoomDA.listRoom[index].name}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              height: 22 / 16,
+                                              color: Color(0xFF262626),
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Expanded(
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFF2F5F8),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: const Text(
+                                                    'Thoát',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        height: 20 / 14,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xFF6E87AA)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  await RoomDA.deleteRoom(RoomDA.listRoom[index]).then(
+                                                    (value) {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  );
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFF366AE2),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: const Text(
+                                                    'Xác nhận',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        height: 20 / 14,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                          setState(() {});
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.delete_outline_rounded,
+                            color: Colors.red[300],
+                          ),
                         ),
                       ),
                     ],
@@ -182,27 +337,189 @@ class _MangeHouseState extends State<MangeHouse> {
           },
         ),
       ),
-      bottomNavigationBar: InkWell(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const UpdateCost(),
-              ));
-        },
+      bottomNavigationBar: RoomDA.listRoom.isEmpty
+          ? null
+          : InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UpdateCost(),
+                    ));
+              },
+              child: Container(
+                height: 40,
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF366AE2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Cập nhật tiền phòng',
+                  style: TextStyle(fontSize: 14, height: 22 / 14, color: Colors.white),
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+class DialogCreateRoom extends StatefulWidget {
+  final bool isAdd;
+  final RoomItem? roomItem;
+  const DialogCreateRoom({super.key, this.isAdd = true, this.roomItem});
+
+  @override
+  State<DialogCreateRoom> createState() => _DialogCreateRoomState();
+}
+
+class _DialogCreateRoomState extends State<DialogCreateRoom> {
+  final TextEditingController editName = TextEditingController();
+  final FocusNode focusNode = FocusNode();
+  String errorText = '';
+
+  @override
+  void initState() {
+    editName.text = widget.roomItem?.name ?? '';
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      child: IntrinsicHeight(
         child: Container(
-          height: 40,
           width: double.infinity,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF366AE2),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Text(
-            'Cập nhật tiền phòng',
-            style: TextStyle(fontSize: 14, height: 22 / 14, color: Colors.white),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.isAdd ? 'Tạo phòng mới' : 'Sửa tên phòng',
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w600, height: 22 / 16, color: Color(0xFF262626)),
+              ),
+              Container(
+                height: 56,
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F5F8),
+                  border: Border.all(
+                      width: 1.5,
+                      color: errorText == ''
+                          ? focusNode.hasFocus
+                              ? const Color(0xFF1890FF)
+                              : const Color(0xFFE5EAF0)
+                          : const Color(0xFFE00000)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Focus(
+                  onFocusChange: (value) {
+                    setState(() {});
+                  },
+                  child: TextFormField(
+                    controller: editName,
+                    onChanged: (value) {
+                      setState(() {
+                        errorText = '';
+                      });
+                    },
+                    focusNode: focusNode,
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: 'Số phòng',
+                      isDense: true,
+                      contentPadding: EdgeInsets.all(16),
+                      border: InputBorder.none,
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 22 / 16,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  errorText,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFFE00000),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF2F5F8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Thoát',
+                        style: TextStyle(
+                            fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w500, color: Color(0xFF6E87AA)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () async {
+                      if (editName.text == '') {
+                        setState(() {
+                          errorText = "Số phòng không được để trống";
+                        });
+                      } else {
+                        if (widget.isAdd) {
+                          RoomItem newRoom = RoomItem.fromJson(RoomDA.defaultRoom.toJson());
+                          newRoom.name = editName.text;
+                          await RoomDA.addRoom(newRoom);
+                          await UserDA.addAccount(UserItem(
+                            roomId: newRoom.id,
+                            accName: newRoom.name,
+                            password: newRoom.name,
+                            userName: newRoom.name,
+                            role: 1,
+                          )).then((value) => Navigator.pop(context));
+                        } else {
+                          if (editName.text != widget.roomItem?.name) {
+                            widget.roomItem!.name = editName.text;
+                            await RoomDA.editRoom(widget.roomItem!);
+                          }
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                        }
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF366AE2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Xác nhận',
+                        style:
+                            TextStyle(fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w500, color: Colors.white),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
           ),
         ),
       ),

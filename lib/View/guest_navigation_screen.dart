@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:project1/View/guest_home_screen.dart';
-import 'package:project1/View/noti_screen.dart';
 import 'package:project1/View/payment_screen.dart';
 
 class GuestNavigationScreen extends StatefulWidget {
@@ -33,8 +32,6 @@ class _GuestNavigationScreenState extends State<GuestNavigationScreen> {
           case 0:
             return const GuestHomeScreen();
           case 1:
-            return const NotiScreen();
-          case 2:
             return const PaymentScreen();
           default:
             return const GuestHomeScreen();
@@ -78,20 +75,8 @@ class _GuestNavigationScreenState extends State<GuestNavigationScreen> {
                 height: 20,
                 margin: const EdgeInsets.only(bottom: 4),
                 child: SvgPicture.asset(
-                  'lib/Assets/bell.svg',
-                  color: currentTab == 1 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
-                ),
-              ),
-              label: 'Thông báo',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                width: 20,
-                height: 20,
-                margin: const EdgeInsets.only(bottom: 4),
-                child: SvgPicture.asset(
                   'lib/Assets/payment.svg',
-                  color: currentTab == 2 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
+                  color: currentTab == 1 ? const Color(0xFF366AE2) : const Color(0xFFBFBFBF),
                 ),
               ),
               label: 'Thanh toán',

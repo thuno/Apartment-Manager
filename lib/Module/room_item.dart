@@ -1,4 +1,6 @@
 import 'package:project1/Firebase/database_store.dart';
+import 'package:project1/Module/guest_infor_item.dart';
+import 'package:project1/Module/user_item.dart';
 
 class RoomItem {
   String? id;
@@ -95,11 +97,11 @@ class RoomDA {
   static RoomItem? roomAccount;
   static RoomItem defaultRoom = RoomItem(
     roomCost: 6000000,
-    oldElectricNumber: 3824,
-    newElectricNumber: 4012,
+    oldElectricNumber: 0,
+    newElectricNumber: 0,
     electricity: 4000,
-    oldWaterNumber: 1298,
-    newWaterNumber: 1303,
+    oldWaterNumber: 0,
+    newWaterNumber: 0,
     water: 30000,
     internet: 100000,
     otherService: 100000,
@@ -128,8 +130,13 @@ class RoomDA {
     listRoom[listRoom.indexWhere((element) => element.id == roomItem.id)] = roomItem;
   }
 
-  static Future<void> deleteRoom(String roomId) async {
-    await FireBaseDA.delete(collection, roomId);
-    listRoom.removeWhere((element) => element.id == roomId);
+  static Future<void> deleteRoom(RoomItem roomItem) async {
+    await FireBaseDA.delete(collection, roomItem.id!);
+    await UserDA.deleteUser(roomItem.id!);
+    if (roomItem.guestId != null) {
+      await GuestInforDA.deleteInfor(roomItem.guestId!);
+      await FireBaseDA.deleteFile(roomItem.name);
+    }
+    listRoom.removeWhere((element) => element.id == roomItem.id);
   }
 }

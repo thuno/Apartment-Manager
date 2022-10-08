@@ -283,8 +283,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     ),
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const MangeHouse()));
+                        onTap: () async {
+                          await Navigator.push(context, MaterialPageRoute(builder: (context) => const MangeHouse()));
+                          setState(() {});
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -342,16 +343,16 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     children: [
                       Transform.scale(
                         scale: 0.7,
-                        child: CircularProgressIndicator(
-                          backgroundColor: (listRoomPaid.length / RoomDA.listRoom.length) > 0.9
-                              ? const Color(0xFF84ED9C)
-                              : const Color(0xFFFCF2EF),
-                          color: (listRoomPaid.length / RoomDA.listRoom.length) > 0.9
-                              ? const Color(0xFF33BC58)
-                              : const Color(0xFFF94033),
-                          strokeWidth: 40,
-                          value: listRoomPaid.length / RoomDA.listRoom.length,
-                        ),
+                        child: Builder(builder: (context) {
+                          double value =
+                              RoomDA.listRoom.isNotEmpty ? (listRoomPaid.length / RoomDA.listRoom.length) : 0;
+                          return CircularProgressIndicator(
+                            backgroundColor: (value) > 0.9 ? const Color(0xFF84ED9C) : const Color(0xFFFCF2EF),
+                            color: (value) > 0.9 ? const Color(0xFF33BC58) : const Color(0xFFF94033),
+                            strokeWidth: 40,
+                            value: value,
+                          );
+                        }),
                       ),
                       Center(
                         child: Text(

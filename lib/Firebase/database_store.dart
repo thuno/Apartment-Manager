@@ -12,7 +12,9 @@ class FireBaseDA {
     for (var element in snapshot.docs) {
       var result = await collectionReference.doc(element.id).get();
       Map<String, dynamic> jsonObj = jsonDecode(jsonEncode(result.data()));
-      jsonObj['ID'] = element.id;
+      if (jsonObj['ID'] == null) {
+        jsonObj['ID'] = element.id;
+      }
       listData.add(jsonObj);
     }
     return listData;

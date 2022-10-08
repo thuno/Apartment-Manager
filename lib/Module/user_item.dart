@@ -6,13 +6,15 @@ class UserItem {
   String? userName;
   String? password;
   String? avatar;
+  String? roomId;
   int? role;
 
-  UserItem({this.id, this.accName, this.userName, this.password, this.avatar, this.role});
+  UserItem({this.id, this.accName, this.userName, this.password, this.avatar, this.role, this.roomId});
 
   static UserItem fromJson(Map<String, dynamic> json) {
     return UserItem(
       id: json['ID'],
+      roomId: json['RoomID'],
       accName: json['AccountName'],
       userName: json['UserName'],
       password: json['Password'],
@@ -23,7 +25,7 @@ class UserItem {
 
   Map<String, dynamic> toJson() {
     return {
-      'ID': id,
+      'RoomID': roomId,
       'AccountName': accName,
       'UserName': userName,
       'Password': password,
@@ -45,6 +47,18 @@ class UserDA {
   }
 
   static Future<void> addAccount(UserItem newAcc) async {
-    await FireBaseDA.add(collection, newAcc.toJson());
+    var newID = await FireBaseDA.add(collection, newAcc.toJson());
+    newAcc.id = newID;
+    listAccount.add(newAcc);
+  }
+
+  static Future<void> editUser(UserItem userItem) async {
+    await FireBaseDA.edit(collection, userItem.id!, userItem.toJson());
+    listAccount[listAccount.indexWhere((element) => element.id == userItem.id)] = userItem;
+  }
+
+  static Future<void> deleteUser(String id) async {
+    await FireBaseDA.delete(collection, id);
+    listAccount.removeWhere((e) => e.id == id);
   }
 }
