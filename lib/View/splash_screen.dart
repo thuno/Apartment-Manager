@@ -36,11 +36,22 @@ class _SplashScreenState extends State<SplashScreen> {
         return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
       } else if (value == 'Admin') {
         await RoomDA.getListRoom();
-        await UserDA.getListAccount();
+        await UserDA.getListAccount().then((_) {
+          UserDA.user = UserDA.listAccount.firstWhere(
+            (e) => e.roomId == 'Admin',
+            orElse: () => UserItem(),
+          );
+        });
         // ignore: use_build_context_synchronously
         return Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => const OwnerNavigationScreen()));
       } else {
+        await UserDA.getListAccount().then((_) {
+          UserDA.user = UserDA.listAccount.firstWhere(
+            (e) => e.roomId == value,
+            orElse: () => UserItem(),
+          );
+        });
         await RoomDA.getRoomAccount(value);
         // ignore: use_build_context_synchronously
         return Navigator.pushReplacement(

@@ -319,7 +319,7 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
                         if (widget.roomItem?.guestId != null) {
                           widget.roomItem!.guestId = null;
                           await RoomDA.editRoom(widget.roomItem!);
-                          await GuestInforDA.deleteInfor(widget.roomItem!.guestId!);
+                          await GuestInforDA.deleteInfor(widget.guestInfor!);
                           await FireBaseDA.deleteFile(widget.roomItem!.name);
                           widget.resetData!();
                         }

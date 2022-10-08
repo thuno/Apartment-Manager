@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/contact_screen.dart';
 
+import '../Module/guest_infor_item.dart';
+
 class ListMessage extends StatefulWidget {
   const ListMessage({super.key});
 
@@ -13,6 +15,7 @@ class ListMessage extends StatefulWidget {
 class _ListMessageState extends State<ListMessage> {
   @override
   Widget build(BuildContext context) {
+    List<RoomItem> listRoomContact = RoomDA.listRoom.where((e) => e.guestId != null).toList();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -37,15 +40,17 @@ class _ListMessageState extends State<ListMessage> {
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
           physics: const BouncingScrollPhysics(),
-          itemCount: RoomDA.listRoom.length,
+          itemCount: listRoomContact.length,
           itemBuilder: (context, index) {
             return InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ContactScreen(),
-                    ));
+              onTap: () async {
+                await GuestInforDA.getInfor(listRoomContact[index].guestId!).then(
+                  (value) => Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return ContactScreen(guestInfor: value);
+                    },
+                  )),
+                );
               },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 8),
@@ -70,7 +75,7 @@ class _ListMessageState extends State<ListMessage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Phòng ${RoomDA.listRoom[index].name}',
+                            'Phòng ${listRoomContact[index].name}',
                             style: const TextStyle(
                               fontSize: 16,
                               height: 24 / 16,

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project1/Module/room_item.dart';
 import 'package:project1/Module/user_item.dart';
@@ -206,6 +207,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               SharedPreferences store = await _prefs;
                               await store.setString('timer', DateTime.now().toString());
                               await store.setString('userID', user.roomId!);
+                              UserDA.user = UserDA.listAccount.firstWhere(
+                                (e) => e.roomId == user.roomId,
+                                orElse: () => UserItem(),
+                              );
                               await RoomDA.getListRoom().then(
                                 (value) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
                                   if (user.role == 0) {

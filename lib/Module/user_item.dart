@@ -37,13 +37,12 @@ class UserItem {
 
 class UserDA {
   static String collection = 'User';
-  static UserItem? admin;
+  static UserItem? user;
   static List<UserItem> listAccount = [];
 
   static Future<void> getListAccount() async {
     var listData = await FireBaseDA.getColData(collection);
     listAccount = listData.map((e) => UserItem.fromJson(e)).toList();
-    admin = listAccount.firstWhere((e) => e.role == 0, orElse: () => UserItem());
   }
 
   static Future<void> addAccount(UserItem newAcc) async {

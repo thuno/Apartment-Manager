@@ -1,12 +1,12 @@
 import 'package:project1/Firebase/database_store.dart';
 import 'package:project1/Module/guest_infor_item.dart';
+import 'package:project1/Module/message_item.dart';
 import 'package:project1/Module/user_item.dart';
 
 class RoomItem {
   String? id;
   String? name;
   int? numberUser;
-  String? password;
   int? roomCost;
   int? electricity;
   int? oldElectricNumber;
@@ -27,7 +27,6 @@ class RoomItem {
     this.id,
     this.name,
     this.numberUser,
-    this.password,
     this.roomCost,
     this.oldElectricNumber,
     this.newElectricNumber,
@@ -54,7 +53,6 @@ class RoomItem {
       id: json['ID'],
       name: json['Name'],
       numberUser: json['NumberUser'] ?? 0,
-      password: json['Password'],
       roomCost: json['RoomCost'],
       oldElectricNumber: json['OldElectricNumber'],
       newElectricNumber: json['NewElectricNumber'],
@@ -74,7 +72,6 @@ class RoomItem {
     return {
       'Name': name,
       'NumberUser': numberUser,
-      'Password': password,
       'RoomCost': roomCost,
       'OldElectricNumber': oldElectricNumber,
       'NewElectricNumber': newElectricNumber,
@@ -134,7 +131,8 @@ class RoomDA {
     await FireBaseDA.delete(collection, roomItem.id!);
     await UserDA.deleteUser(roomItem.id!);
     if (roomItem.guestId != null) {
-      await GuestInforDA.deleteInfor(roomItem.guestId!);
+      GuestInforItem guestInfor = await GuestInforDA.getInfor(roomItem.guestId!);
+      await GuestInforDA.deleteInfor(guestInfor);
       await FireBaseDA.deleteFile(roomItem.name);
     }
     listRoom.removeWhere((element) => element.id == roomItem.id);

@@ -1,3 +1,5 @@
+import 'package:project1/Module/message_item.dart';
+
 import '../Firebase/database_store.dart';
 
 class GuestInforItem {
@@ -8,8 +10,17 @@ class GuestInforItem {
   String? ccNumber;
   List<String>? photos;
   String? contractPhoto;
+  String? messageId;
 
-  GuestInforItem({this.id, this.name, this.birthday, this.address, this.ccNumber, this.photos, this.contractPhoto});
+  GuestInforItem(
+      {this.id,
+      this.name,
+      this.birthday,
+      this.address,
+      this.ccNumber,
+      this.photos,
+      this.contractPhoto,
+      this.messageId});
 
   static GuestInforItem fromJson(Map<String, dynamic> json) {
     return GuestInforItem(
@@ -18,6 +29,7 @@ class GuestInforItem {
       birthday: json['BirthDay'],
       address: json['Address'],
       ccNumber: json['CCCD'],
+      messageId: json['MessageID'],
     );
   }
 
@@ -27,6 +39,7 @@ class GuestInforItem {
       'BirthDay': birthday,
       'Address': address,
       'CCCD': ccNumber,
+      'MessageID': messageId,
     };
   }
 }
@@ -42,6 +55,9 @@ class GuestInforDA {
   }
 
   static Future<void> addInfor(GuestInforItem guestInfor) async {
+    var historyMessage = MessageHistoryItem();
+    await MessageDA.addMessHistory(historyMessage);
+    guestInfor.messageId = historyMessage.id;
     var newID = await FireBaseDA.add(collection, guestInfor.toJson());
     guestInfor.id = newID;
   }
@@ -50,7 +66,10 @@ class GuestInforDA {
     await FireBaseDA.edit(collection, guestInfor.id!, guestInfor.toJson());
   }
 
-  static Future<void> deleteInfor(String guestID) async {
-    await FireBaseDA.delete(collection, guestID);
+  static Future<void> deleteInfor(GuestInforItem guestInfor) async {
+    await FireBaseDA.delete(collection, guestInfor.id!);
+    if (guestInfor.messageId != null) {
+      MessageDA.deleteMessHistory(guestInfor.messageId!);
+    }
   }
 }
