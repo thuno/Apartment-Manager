@@ -100,22 +100,32 @@ class _PaymentStatusState extends State<PaymentStatus> {
                       InkWell(
                         child: Row(
                           children: [
-                            const Text(
-                              'Đã thanh toán',
-                              style: TextStyle(
-                                fontSize: 16,
-                                height: 22 / 16,
+                            Text(
+                              RoomDA.listRoom[index].guestId == null ? 'Phòng trống' : 'Đã thanh toán',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                height: 22 / 14,
                                 color: Color(0xFF595959),
                               ),
                             ),
                             Transform.scale(
                               scale: 28 / 32,
                               child: Checkbox(
-                                value: RoomDA.listRoom[index].payementStatus,
+                                value: RoomDA.listRoom[index].guestId == null
+                                    ? null
+                                    : RoomDA.listRoom[index].payementStatus,
+                                tristate: true,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                onChanged: (value) {},
+                                onChanged: (value) {
+                                  if (RoomDA.listRoom[index].guestId != null) {
+                                    setState(() {
+                                      RoomDA.listRoom[index].payementStatus = !RoomDA.listRoom[index].payementStatus!;
+                                      RoomDA.editRoom(RoomDA.listRoom[index]);
+                                    });
+                                  }
+                                },
                               ),
                             )
                           ],

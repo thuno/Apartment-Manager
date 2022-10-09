@@ -17,7 +17,23 @@ class ContactScreen extends StatefulWidget {
 class _ContactScreenState extends State<ContactScreen> {
   final TextEditingController messEdit = TextEditingController();
   final FocusNode messFocus = FocusNode();
-  List<MessageItem> listMessage = [];
+  MessageHistoryItem messHistory = MessageHistoryItem(
+    listMessage: [],
+  );
+
+  @override
+  void dispose() {
+    if (messHistory.listMessage.isNotEmpty) {
+      Iterable<MessageItem> listUnSeen = messHistory.listMessage.where((e) => !e.isSeen && e.userId != UserDA.user!.id);
+      if (listUnSeen.isNotEmpty) {
+        for (var e in listUnSeen) {
+          e.isSeen = true;
+        }
+        MessageDA.editMessHistory(messHistory);
+      }
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +82,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                listMessage = MessageHistoryItem.fromJson(snapshot.data!.data()!).listMessage;
+                messHistory = MessageHistoryItem.fromJson(snapshot.data!.data()!);
               }
               return Container(
                 color: const Color(0xFFF2F5F8),
@@ -76,9 +92,9 @@ class _ContactScreenState extends State<ContactScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         child: ListView.builder(
-                          itemCount: listMessage.length,
+                          itemCount: messHistory.listMessage.length,
                           itemBuilder: (context, index) {
-                            return listMessage[index].userId == UserDA.user!.id
+                            return messHistory.listMessage[index].userId == UserDA.user!.id
                                 ? Container(
                                     margin: EdgeInsets.only(bottom: 16, left: MediaQuery.of(context).size.width * 0.2),
                                     child: Column(
@@ -93,7 +109,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                             borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: Text(
-                                            listMessage[index].message!,
+                                            messHistory.listMessage[index].message!,
                                             style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
@@ -103,7 +119,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                           ),
                                         ),
                                         Text(
-                                          listMessage[index].time!,
+                                          messHistory.listMessage[index].time!,
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
@@ -126,10 +142,11 @@ class _ContactScreenState extends State<ContactScreen> {
                                           decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
                                           ),
-                                          child:
-                                              index == 0 || listMessage[index].userId != listMessage[index - 1].userId
-                                                  ? Image.asset('lib/Assets/Image demo.png')
-                                                  : null,
+                                          child: index == 0 ||
+                                                  messHistory.listMessage[index].userId !=
+                                                      messHistory.listMessage[index - 1].userId
+                                              ? Image.asset('lib/Assets/Image demo.png')
+                                              : null,
                                         ),
                                         Expanded(
                                           child: Column(
@@ -144,7 +161,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                                   borderRadius: BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  listMessage[index].message!,
+                                                  messHistory.listMessage[index].message!,
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w500,
@@ -154,7 +171,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                listMessage[index].time!,
+                                                messHistory.listMessage[index].time!,
                                                 style: const TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
@@ -225,14 +242,13 @@ class _ContactScreenState extends State<ContactScreen> {
                                   FirebaseFirestore.instance.runTransaction((transaction) async {
                                     DocumentSnapshot freshSnap = await transaction.get(snapshot.data!.reference);
                                     var now = DateTime.now();
-                                    listMessage.add(MessageItem(
+                                    messHistory.listMessage.add(MessageItem(
                                       message: messEdit.text,
                                       userId: UserDA.user!.id,
                                       time:
                                           '${now.day < 10 ? "0${now.day}" : now.day}/${now.month < 10 ? "0${now.month}" : now.month}/${now.year} • ${now.hour < 10 ? "0${now.hour}" : now.hour}:${now.minute < 10 ? "0${now.minute}" : now.minute}',
                                     ));
-                                    transaction.set(
-                                        freshSnap.reference, MessageHistoryItem(listMessage: listMessage).toJson());
+                                    transaction.set(freshSnap.reference, messHistory.toJson());
                                     messEdit.text = '';
                                   });
                                 }

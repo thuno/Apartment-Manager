@@ -52,10 +52,14 @@ class _SplashScreenState extends State<SplashScreen> {
             orElse: () => UserItem(),
           );
         });
-        await RoomDA.getRoomAccount(value);
+        var roomItem = await RoomDA.getRoomInfor(value);
         // ignore: use_build_context_synchronously
         return Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const GuestNavigationScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => GuestNavigationScreen(
+                      roomItem: roomItem,
+                    )));
       }
     });
     super.initState();

@@ -201,9 +201,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   });
                                 controller!.repeat();
                               });
-                              if (user.role == 1) {
-                                RoomDA.getRoomAccount(user.roomId!);
-                              }
+
                               SharedPreferences store = await _prefs;
                               await store.setString('timer', DateTime.now().toString());
                               await store.setString('userID', user.roomId!);
@@ -211,15 +209,21 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                 (e) => e.roomId == user.roomId,
                                 orElse: () => UserItem(),
                               );
-                              await RoomDA.getListRoom().then(
-                                (value) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                                  if (user.role == 0) {
-                                    return const OwnerNavigationScreen();
-                                  } else {
-                                    return const GuestNavigationScreen();
-                                  }
-                                })),
-                              );
+                              if (user.role == 0) {
+                                await RoomDA.getListRoom().then(
+                                  (value) => Navigator.pushReplacement(
+                                      context, MaterialPageRoute(builder: (context) => const OwnerNavigationScreen())),
+                                );
+                              } else {
+                                await RoomDA.getRoomInfor(user.roomId!).then((value) => Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => GuestNavigationScreen(
+                                          roomItem: value,
+                                        ),
+                                      ),
+                                    ));
+                              }
                               controller?.removeListener(() {});
                             }
                           }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/guest_home_screen.dart';
 import 'package:project1/View/payment_screen.dart';
 
 class GuestNavigationScreen extends StatefulWidget {
-  const GuestNavigationScreen({super.key});
+  final RoomItem? roomItem;
+  const GuestNavigationScreen({super.key, this.roomItem});
 
   @override
   State<GuestNavigationScreen> createState() => _GuestNavigationScreenState();
@@ -30,7 +32,7 @@ class _GuestNavigationScreenState extends State<GuestNavigationScreen> {
       body: Builder(builder: (context) {
         switch (currentTab) {
           case 0:
-            return const GuestHomeScreen();
+            return GuestHomeScreen(roomItem: widget.roomItem);
           case 1:
             return const PaymentScreen();
           default:

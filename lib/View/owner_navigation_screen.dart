@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project1/View/list_income_screen.dart';
 import 'package:project1/View/list_message_screen.dart';
 import 'package:project1/View/owner_home_screen.dart';
 
@@ -24,7 +25,7 @@ class _OwnerNavigationScreenState extends State<OwnerNavigationScreen> {
               case 0:
                 return const OwnerHomeScreen();
               case 1:
-                return Container();
+                return const ListIncomeScreen();
               case 2:
                 return const ListMessage();
               default:

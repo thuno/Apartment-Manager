@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:project1/Module/guest_infor_item.dart';
+import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/bill_detail_screen.dart';
 import 'package:project1/View/bill_history_screen.dart';
 import 'package:project1/View/contact_screen.dart';
 
 class GuestHomeScreen extends StatefulWidget {
-  const GuestHomeScreen({super.key});
+  final RoomItem? roomItem;
+  const GuestHomeScreen({super.key, this.roomItem});
 
   @override
   State<GuestHomeScreen> createState() => _GuestHomeScreenState();
@@ -117,12 +120,16 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ContactScreen(),
-                          ));
+                    onTap: () async {
+                      await GuestInforDA.getInfor(widget.roomItem!.guestId!).then(
+                        (value) => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ContactScreen(
+                                guestInfor: value,
+                              ),
+                            )),
+                      );
                     },
                     child: SizedBox(
                       width: 84,

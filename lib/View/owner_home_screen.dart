@@ -79,9 +79,11 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
 
   Future<void> getIncomeHistory() async {
     await IncomeDA.getHistory();
-    setState(() {
-      incomeLastMonth = IncomeDA.history.last;
-    });
+    if (mounted) {
+      setState(() {
+        incomeLastMonth = IncomeDA.history.last;
+      });
+    }
   }
 
   @override
@@ -95,8 +97,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   Widget build(BuildContext context) {
     int? totalIncome;
     if (incomeLastMonth != null) {
-      totalIncome =
-          (incomeLastMonth!.electric! + incomeLastMonth!.water! + incomeLastMonth!.room! + incomeLastMonth!.service!);
+      totalIncome = incomeLastMonth!.total;
     }
     var listIncomeType = [
       {
@@ -249,8 +250,11 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentStatus()));
+                        onTap: () async {
+                          await Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentStatus()));
+                          setState(() {
+                            listRoomPaid = RoomDA.listRoom.where((e) => e.payementStatus ?? false).toList();
+                          });
                         },
                         child: Container(
                           margin: const EdgeInsets.only(right: 16),

@@ -91,7 +91,6 @@ class RoomItem {
 class RoomDA {
   static String collection = "Room";
   static List<RoomItem> listRoom = [];
-  static RoomItem? roomAccount;
   static RoomItem defaultRoom = RoomItem(
     roomCost: 6000000,
     oldElectricNumber: 0,
@@ -105,15 +104,17 @@ class RoomDA {
     vehicle: 0,
   );
 
-  static Future<void> getRoomAccount(String id) async {
+  static Future<RoomItem> getRoomInfor(String id) async {
     var resut = await FireBaseDA.getDocData(collection, id);
-    roomAccount = RoomItem.fromJson(resut);
-    roomAccount!.id = id;
+    var roomItem = RoomItem.fromJson(resut);
+    roomItem.id = id;
+    return roomItem;
   }
 
   static Future<void> getListRoom() async {
     var listData = await FireBaseDA.getColData(collection);
     listRoom = listData.map((e) => RoomItem.fromJson(e)).toList();
+    await GuestInforDA.getListGuestInfor();
   }
 
   static Future<void> addRoom(RoomItem newRoom) async {
@@ -129,10 +130,9 @@ class RoomDA {
 
   static Future<void> deleteRoom(RoomItem roomItem) async {
     await FireBaseDA.delete(collection, roomItem.id!);
-    await UserDA.deleteUser(roomItem.id!);
+    await UserDA.deleteUser(UserDA.listAccount.firstWhere((e) => e.roomId == roomItem.id).id!);
     if (roomItem.guestId != null) {
-      GuestInforItem guestInfor = await GuestInforDA.getInfor(roomItem.guestId!);
-      await GuestInforDA.deleteInfor(guestInfor);
+      await GuestInforDA.deleteInfor(GuestInforDA.guestInforList.firstWhere((e) => e.id == roomItem.guestId));
       await FireBaseDA.deleteFile(roomItem.name);
     }
     listRoom.removeWhere((element) => element.id == roomItem.id);

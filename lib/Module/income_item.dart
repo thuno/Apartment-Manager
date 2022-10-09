@@ -7,8 +7,11 @@ class IncomeItem {
   int? water;
   int? room;
   int? service;
+  late int total;
 
-  IncomeItem({this.id, this.name, this.electric, this.water, this.room, this.service});
+  IncomeItem({this.id, this.name, this.electric, this.water, this.room, this.service}) {
+    total = electric! + water! + room! + service!;
+  }
 
   static IncomeItem fromJson(Map<String, dynamic> json) {
     return IncomeItem(

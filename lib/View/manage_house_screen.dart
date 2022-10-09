@@ -486,21 +486,12 @@ class _DialogCreateRoomState extends State<DialogCreateRoom> {
                         if (widget.isAdd) {
                           RoomItem newRoom = RoomItem.fromJson(RoomDA.defaultRoom.toJson());
                           newRoom.name = editName.text;
-                          await RoomDA.addRoom(newRoom);
-                          await UserDA.addAccount(UserItem(
-                            roomId: newRoom.id,
-                            accName: newRoom.name,
-                            password: newRoom.name,
-                            userName: newRoom.name,
-                            role: 1,
-                          )).then((value) => Navigator.pop(context));
+                          await RoomDA.addRoom(newRoom).then((value) => Navigator.pop(context));
                         } else {
                           if (editName.text != widget.roomItem?.name) {
                             widget.roomItem!.name = editName.text;
-                            await RoomDA.editRoom(widget.roomItem!);
+                            await RoomDA.editRoom(widget.roomItem!).then((_) => Navigator.pop(context));
                           }
-                          // ignore: use_build_context_synchronously
-                          Navigator.pop(context);
                         }
                       }
                     },

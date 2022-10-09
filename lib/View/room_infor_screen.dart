@@ -25,21 +25,24 @@ class _RoomInforState extends State<RoomInfor> {
   int currentTab = 0;
   GuestInforItem guestInfor = GuestInforItem(photos: []);
 
+  Future<void> getGuestInfor() async {
+    var result = GuestInforDA.guestInforList.firstWhere((e) => e.id == widget.roomItem!.guestId);
+    var photos = await FireBaseDA.getFiles(widget.roomItem!.name);
+    result.photos = photos;
+    var contractPhoto = await FireBaseDA.getFiles('${widget.roomItem!.name}/contract');
+    if (contractPhoto.isNotEmpty) {
+      result.contractPhoto = contractPhoto.single;
+    }
+    setState(() {
+      guestInfor = result;
+    });
+  }
+
   @override
   void initState() {
     RoomInfor.isChange = false;
     if (widget.roomItem?.guestId != null) {
-      GuestInforDA.getInfor(widget.roomItem!.guestId!).then((value) async {
-        var photos = await FireBaseDA.getFiles(widget.roomItem!.name);
-        value.photos = photos;
-        var contractPhoto = await FireBaseDA.getFiles('${widget.roomItem!.name}/contract');
-        if (contractPhoto.isNotEmpty) {
-          value.contractPhoto = contractPhoto.single;
-        }
-        setState(() {
-          guestInfor = value;
-        });
-      });
+      getGuestInfor();
     }
     super.initState();
   }
@@ -207,6 +210,13 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
       await GuestInforDA.editInfor(widget.guestInfor!);
     } else {
       await GuestInforDA.addInfor(widget.guestInfor!);
+      await UserDA.addAccount(UserItem(
+        roomId: widget.roomItem!.id,
+        accName: widget.roomItem!.name,
+        password: widget.roomItem!.name,
+        userName: widget.roomItem!.name,
+        role: 1,
+      ));
     }
     for (var path in widget.guestInfor!.photos!.where((e) => !e.contains(widget.roomItem!.name!))) {
       await FireBaseDA.putFile(path, folder: widget.roomItem!.name);
@@ -321,6 +331,8 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
                           await RoomDA.editRoom(widget.roomItem!);
                           await GuestInforDA.deleteInfor(widget.guestInfor!);
                           await FireBaseDA.deleteFile(widget.roomItem!.name);
+                          await UserDA.deleteUser(
+                              UserDA.listAccount.firstWhere((e) => e.roomId == widget.roomItem!.id).id!);
                           widget.resetData!();
                         }
                       },
@@ -805,8 +817,12 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
 class MoneyFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final oCcy = NumberFormat("#,##0", "en_US");
-    var convertText = oCcy.format(int.tryParse(newValue.text.replaceAll(",", "").replaceAll(" (VNĐ)", "")));
+    String convertText = '';
+    try {
+      final oCcy = NumberFormat("#,##0", "en_US");
+      convertText = oCcy.format(int.tryParse(newValue.text.replaceAll(",", "").replaceAll(" (VNĐ)", "")));
+      // ignore: empty_catches
+    } catch (e) {}
     var convertValue = TextEditingValue(
         selection: TextSelection(baseOffset: convertText.length, extentOffset: convertText.length),
         text: '$convertText (VNĐ)');

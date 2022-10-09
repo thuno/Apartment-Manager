@@ -881,7 +881,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                 ),
                               )
                             : Text(
-                                'Lưu và tiếp tục',
+                                'Lưu thông tin',
                                 style: TextStyle(
                                   fontSize: 14,
                                   height: 22 / 14,
@@ -901,8 +901,12 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
 class MoneyFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final oCcy = NumberFormat("#,##0", "en_US");
-    var convertText = oCcy.format(int.tryParse(newValue.text.replaceAll(",", "").replaceAll(" (VNĐ)", "")));
+    String convertText = '';
+    try {
+      final oCcy = NumberFormat("#,##0", "en_US");
+      convertText = oCcy.format(int.tryParse(newValue.text.replaceAll(",", "").replaceAll(" (VNĐ)", "")));
+      // ignore: empty_catches
+    } catch (e) {}
     var convertValue = TextEditingValue(
         selection: TextSelection(baseOffset: convertText.length, extentOffset: convertText.length),
         text: '$convertText (VNĐ)');

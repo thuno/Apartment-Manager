@@ -46,6 +46,12 @@ class GuestInforItem {
 
 class GuestInforDA {
   static String collection = "GuestInfor";
+  static List<GuestInforItem> guestInforList = [];
+
+  static Future<void> getListGuestInfor() async {
+    var listData = await FireBaseDA.getColData(collection);
+    guestInforList = listData.map((e) => GuestInforItem.fromJson(e)).toList();
+  }
 
   static Future<GuestInforItem> getInfor(String guestID) async {
     var result = await FireBaseDA.getDocData(collection, guestID);
@@ -60,14 +66,17 @@ class GuestInforDA {
     guestInfor.messageId = historyMessage.id;
     var newID = await FireBaseDA.add(collection, guestInfor.toJson());
     guestInfor.id = newID;
+    guestInforList.add(guestInfor);
   }
 
   static Future<void> editInfor(GuestInforItem guestInfor) async {
     await FireBaseDA.edit(collection, guestInfor.id!, guestInfor.toJson());
+    guestInforList[guestInforList.indexWhere((e) => e.id == guestInfor.id)] = guestInfor;
   }
 
   static Future<void> deleteInfor(GuestInforItem guestInfor) async {
     await FireBaseDA.delete(collection, guestInfor.id!);
+    guestInforList.removeWhere((e) => e.id == guestInfor.id);
     if (guestInfor.messageId != null) {
       MessageDA.deleteMessHistory(guestInfor.messageId!);
     }
