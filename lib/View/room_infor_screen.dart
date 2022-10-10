@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -23,16 +24,15 @@ class RoomInfor extends StatefulWidget {
 
 class _RoomInforState extends State<RoomInfor> {
   int currentTab = 0;
-  GuestInforItem guestInfor = GuestInforItem(photos: []);
+  GuestInforItem guestInfor = GuestInforItem(photos: [], contractPhotos: []);
+  RoomItem roomItem = RoomItem();
 
   Future<void> getGuestInfor() async {
     var result = GuestInforDA.guestInforList.firstWhere((e) => e.id == widget.roomItem!.guestId);
     var photos = await FireBaseDA.getFiles(widget.roomItem!.name);
     result.photos = photos;
-    var contractPhoto = await FireBaseDA.getFiles('${widget.roomItem!.name}/contract');
-    if (contractPhoto.isNotEmpty) {
-      result.contractPhoto = contractPhoto.single;
-    }
+    var contractPhotos = await FireBaseDA.getFiles('${widget.roomItem!.name}/contract');
+    result.contractPhotos = contractPhotos;
     setState(() {
       guestInfor = result;
     });
@@ -41,6 +41,8 @@ class _RoomInforState extends State<RoomInfor> {
   @override
   void initState() {
     RoomInfor.isChange = false;
+    roomItem = RoomItem.fromJson(widget.roomItem!.toJson());
+    roomItem.id = widget.roomItem!.id;
     if (widget.roomItem?.guestId != null) {
       getGuestInfor();
     }
@@ -77,7 +79,95 @@ class _RoomInforState extends State<RoomInfor> {
             padding: const EdgeInsets.only(top: 12),
             child: InkWell(
               onTap: () {
-                Navigator.pop(context);
+                if (RoomInfor.isChange) {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: IntrinsicHeight(
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Bạn có chắc chắn muốn thoát',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      height: 24 / 18,
+                                      color: Color(0xFF262626)),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 12),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFF2F5F8),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'Ở lại',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  height: 20 / 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF6E87AA)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF366AE2),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'Thoát',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  height: 20 / 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
               },
               child: const Icon(
                 Icons.chevron_left,
@@ -152,12 +242,13 @@ class _RoomInforState extends State<RoomInfor> {
             color: const Color(0xFFF5F5F5),
             child: currentTab == 0
                 ? CommonInforTab(
-                    roomItem: widget.roomItem,
+                    roomItem: roomItem,
                     guestInfor: guestInfor,
                     resetData: () {
                       setState(() {
                         guestInfor = GuestInforItem(
                           photos: [],
+                          contractPhotos: [],
                         );
                       });
                     },
@@ -194,47 +285,65 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
   bool isSaving = false;
 
   Future<void> saveGuestInfor() async {
-    setState(() {
-      controller = AnimationController(
-        vsync: this,
-        duration: const Duration(seconds: 1),
-      )..addListener(() {
-          if (mounted && isSaving) {
-            setState(() {});
-          }
-        });
-      controller!.repeat();
-      isSaving = true;
-    });
-    if (widget.guestInfor?.id != null) {
-      await GuestInforDA.editInfor(widget.guestInfor!);
-    } else {
-      await GuestInforDA.addInfor(widget.guestInfor!);
-      await UserDA.addAccount(UserItem(
-        roomId: widget.roomItem!.id,
-        accName: widget.roomItem!.name,
-        password: widget.roomItem!.name,
-        userName: widget.roomItem!.name,
-        role: 1,
-      ));
-    }
-    for (var path in widget.guestInfor!.photos!.where((e) => !e.contains(widget.roomItem!.name!))) {
-      await FireBaseDA.putFile(path, folder: widget.roomItem!.name);
-    }
-    if (widget.guestInfor?.contractPhoto != null) {
-      await FireBaseDA.putFile(
-        widget.guestInfor!.contractPhoto!,
-        folder: '${widget.roomItem!.name}/contract',
-      );
-    }
-    widget.roomItem!.guestId = widget.guestInfor!.id;
-    await RoomDA.editRoom(widget.roomItem!).then((value) {
+    FocusScope.of(context).unfocus();
+    try {
       setState(() {
-        isSaving = false;
-        RoomInfor.isChange = false;
-        controller?.removeListener(() {});
+        controller = AnimationController(
+          vsync: this,
+          duration: const Duration(seconds: 1),
+        )..addListener(() {
+            if (mounted && isSaving) {
+              setState(() {});
+            }
+          });
+        controller!.repeat();
+        isSaving = true;
       });
-    });
+      if (widget.guestInfor?.id != null) {
+        await GuestInforDA.editInfor(widget.guestInfor!);
+      } else {
+        await GuestInforDA.addInfor(widget.guestInfor!);
+        await UserDA.addAccount(UserItem(
+          roomId: widget.roomItem!.id,
+          accName: widget.roomItem!.name,
+          password: widget.roomItem!.name,
+          userName: widget.roomItem!.name,
+          role: 1,
+        ));
+      }
+      for (var path in widget.guestInfor!.photos!.where((e) => !e.contains(widget.roomItem!.name!))) {
+        await FireBaseDA.putFile(path, folder: widget.roomItem!.name);
+      }
+      for (var path in widget.guestInfor!.contractPhotos!.where((e) => !e.contains(widget.roomItem!.name!))) {
+        await FireBaseDA.putFile(path, folder: '${widget.roomItem!.name}/contract');
+      }
+      widget.roomItem!.guestId = widget.guestInfor!.id;
+      await RoomDA.editRoom(widget.roomItem!).then((value) {
+        setState(() {
+          isSaving = false;
+          RoomInfor.isChange = false;
+          controller?.removeListener(() {});
+        });
+        var newRoomItem = RoomItem.fromJson(widget.roomItem!.toJson());
+        newRoomItem.id = widget.roomItem!.id;
+        RoomDA.listRoom[RoomDA.listRoom.indexWhere((e) => e.id == widget.roomItem!.id)] = newRoomItem;
+        if (ScaffoldMessenger.of(context).mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+            'Lưu thông tin khách thuê phòng thành công',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          )));
+        }
+      });
+    } catch (e) {
+      if (ScaffoldMessenger.of(context).mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+          'Lưu thông tin khách thuê phòng không hành công',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        )));
+      }
+    }
   }
 
   @override
@@ -842,46 +951,49 @@ class LeaseTab extends StatefulWidget {
 class _LeaseTabState extends State<LeaseTab> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: widget.guestInfor!.contractPhoto == null
-          ? InkWell(
-              onTap: () async {
-                FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-                if (result != null) {
-                  setState(() {
-                    widget.guestInfor!.contractPhoto = result.paths.single;
-                    RoomInfor.isChange = true;
-                  });
-                }
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        for (var path in widget.guestInfor!.contractPhotos ?? [])
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Image.network(
+              path,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.file(File(path), fit: BoxFit.cover);
               },
-              child: DottedBorder(
-                borderType: BorderType.RRect,
-                color: const Color(0xFF1890FF),
-                radius: const Radius.circular(8),
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.add,
-                    size: 44,
-                    color: Color(0xFF1890FF),
-                  ),
+            ),
+          ),
+        Center(
+          child: InkWell(
+            onTap: () async {
+              FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: true);
+              if (result != null) {
+                setState(() {
+                  widget.guestInfor!.contractPhotos!.addAll([...result.paths.cast<String>()]);
+                  RoomInfor.isChange = true;
+                });
+              }
+            },
+            child: DottedBorder(
+              borderType: BorderType.RRect,
+              color: const Color(0xFF1890FF),
+              radius: const Radius.circular(8),
+              child: Container(
+                width: 80,
+                height: 80,
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.add,
+                  size: 44,
+                  color: Color(0xFF1890FF),
                 ),
               ),
-            )
-          : Container(
-              width: double.infinity,
-              height: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Image.network(
-                widget.guestInfor!.contractPhoto!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.file(File(widget.guestInfor!.contractPhoto!), fit: BoxFit.cover);
-                },
-              ),
             ),
+          ),
+        ),
+      ],
     );
   }
 }

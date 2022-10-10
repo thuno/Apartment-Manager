@@ -9,18 +9,19 @@ class GuestInforItem {
   String? address;
   String? ccNumber;
   List<String>? photos;
-  String? contractPhoto;
+  List<String>? contractPhotos;
   String? messageId;
 
-  GuestInforItem(
-      {this.id,
-      this.name,
-      this.birthday,
-      this.address,
-      this.ccNumber,
-      this.photos,
-      this.contractPhoto,
-      this.messageId});
+  GuestInforItem({
+    this.id,
+    this.name,
+    this.birthday,
+    this.address,
+    this.ccNumber,
+    this.photos,
+    this.contractPhotos,
+    this.messageId,
+  });
 
   static GuestInforItem fromJson(Map<String, dynamic> json) {
     return GuestInforItem(

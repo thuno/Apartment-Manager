@@ -83,6 +83,7 @@ class _ContactScreenState extends State<ContactScreen> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 messHistory = MessageHistoryItem.fromJson(snapshot.data!.data()!);
+                messHistory.id = widget.guestInfor!.messageId;
               }
               return Container(
                 color: const Color(0xFFF2F5F8),

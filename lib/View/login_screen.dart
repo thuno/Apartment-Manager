@@ -23,11 +23,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   String passError = '';
   bool isLoading = false;
   AnimationController? controller;
+  bool saveLogin = true;
 
   @override
   void initState() {
     UserDA.getListAccount();
-
     super.initState();
   }
 
@@ -154,8 +154,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     Row(
                       children: [
                         Checkbox(
-                          value: true,
-                          onChanged: (v) {},
+                          value: saveLogin,
+                          onChanged: (v) {
+                            setState(() {
+                              saveLogin = !saveLogin;
+                            });
+                          },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -202,9 +206,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                 controller!.repeat();
                               });
 
-                              SharedPreferences store = await _prefs;
-                              await store.setString('timer', DateTime.now().toString());
-                              await store.setString('userID', user.roomId!);
+                              if (saveLogin) {
+                                SharedPreferences store = await _prefs;
+                                await store.setString('timer', DateTime.now().toString());
+                                await store.setString('userID', user.roomId!);
+                              }
                               UserDA.user = UserDA.listAccount.firstWhere(
                                 (e) => e.roomId == user.roomId,
                                 orElse: () => UserItem(),

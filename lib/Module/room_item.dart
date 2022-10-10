@@ -39,33 +39,40 @@ class RoomItem {
     this.vehicle,
     this.payementStatus,
     this.guestId,
+    this.deposit,
+    this.dateStart,
   }) {
-    totalBill = roomCost! +
-        electricity! * (newElectricNumber! - oldElectricNumber!) +
-        water! * (newWaterNumber! - oldWaterNumber!) +
-        internet! +
-        otherService! +
-        vehicle!;
+    if (roomCost != null) {
+      totalBill = roomCost! +
+          electricity! * (newElectricNumber! - oldElectricNumber!) +
+          water! * (newWaterNumber! - oldWaterNumber!) +
+          internet! +
+          otherService! +
+          vehicle!;
+    } else {
+      totalBill = 0;
+    }
   }
 
   static RoomItem fromJson(Map<String, dynamic> json) {
     return RoomItem(
-      id: json['ID'],
-      name: json['Name'],
-      numberUser: json['NumberUser'] ?? 0,
-      roomCost: json['RoomCost'],
-      oldElectricNumber: json['OldElectricNumber'],
-      newElectricNumber: json['NewElectricNumber'],
-      electricity: json['electricity'],
-      oldWaterNumber: json['OldWaterNumber'],
-      newWaterNumber: json['NewWaterNumber'],
-      water: json['Water'],
-      internet: json['Internet'],
-      otherService: json['OtherService'],
-      vehicle: json['Vehicle'],
-      payementStatus: json['PayementStatus'] ?? false,
-      guestId: json['GuestID'],
-    );
+        id: json['ID'],
+        name: json['Name'],
+        numberUser: json['NumberUser'] ?? 0,
+        roomCost: json['RoomCost'],
+        oldElectricNumber: json['OldElectricNumber'],
+        newElectricNumber: json['NewElectricNumber'],
+        electricity: json['electricity'],
+        oldWaterNumber: json['OldWaterNumber'],
+        newWaterNumber: json['NewWaterNumber'],
+        water: json['Water'],
+        internet: json['Internet'],
+        otherService: json['OtherService'],
+        vehicle: json['Vehicle'],
+        payementStatus: json['PayementStatus'] ?? false,
+        guestId: json['GuestID'],
+        deposit: json['Deposit'],
+        dateStart: json['DateStart']);
   }
 
   Map<String, dynamic> toJson() {
@@ -84,6 +91,8 @@ class RoomItem {
       'Vehicle': vehicle,
       'PayementStatus': payementStatus,
       'GuestID': guestId,
+      'Deposit': deposit,
+      'DateStart': dateStart,
     };
   }
 }

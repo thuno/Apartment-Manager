@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/payment_screen.dart';
 
 class BillDetailsScreen extends StatefulWidget {
-  const BillDetailsScreen({super.key});
+  final RoomItem? roomItem;
+  final int paymentStatus;
+  const BillDetailsScreen({super.key, this.roomItem, this.paymentStatus = 0});
 
   @override
   State<BillDetailsScreen> createState() => _BillDetailsScreenState();
 }
 
 class _BillDetailsScreenState extends State<BillDetailsScreen> {
+  final oCcy = NumberFormat("#,##0", "en_US");
+  DateTime lastMonth = DateTime(DateTime.now().year, DateTime.now().month, 0);
+  int payDay = 1;
+
+  @override
+  void initState() {
+    payDay = int.parse(widget.roomItem!.dateStart!.split("/").first);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,9 +52,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         centerTitle: true,
         title: Column(
           children: [
-            const Text(
-              'Chi tiết tiền phòng tháng 8',
-              style: TextStyle(
+            Text(
+              'Chi tiết tiền phòng tháng ${lastMonth.month}',
+              style: const TextStyle(
                 fontSize: 16,
                 height: 24 / 16,
                 color: Color(0xFF1C2430),
@@ -48,9 +62,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
             ),
             Container(
               margin: const EdgeInsets.only(top: 8),
-              child: const Text(
-                'Tính đến ngày 31/8/2022',
-                style: TextStyle(
+              child: Text(
+                'Tính đến ngày ${lastMonth.day}/${lastMonth.month < 10 ? "0${lastMonth.month}" : lastMonth.month}/${lastMonth.year}',
+                style: const TextStyle(
                   fontSize: 14,
                   height: 22 / 14,
                   color: Color(0xFF4B6281),
@@ -87,9 +101,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Ngày nộp tiền 10/09/2022',
-                      style: TextStyle(
+                    Text(
+                      'Ngày nộp tiền $payDay/${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}/${DateTime.now().year}',
+                      style: const TextStyle(
                         fontSize: 12,
                         height: 16 / 12,
                         color: Color(0xFF4D7AE5),
@@ -97,9 +111,13 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 4),
-                      child: const Text(
-                        'Sắp hết hạn',
-                        style: TextStyle(
+                      child: Text(
+                        widget.paymentStatus == 0
+                            ? 'Đã thanh toán'
+                            : widget.paymentStatus == 2
+                                ? 'Trễ hạn'
+                                : 'Chưa thanh toán',
+                        style: const TextStyle(
                           fontSize: 16,
                           height: 24 / 16,
                           color: Color(0xFF366AE2),
@@ -130,8 +148,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'Tiền phòng',
                         style: TextStyle(
                           fontSize: 14,
@@ -140,8 +158,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        '6,000,000',
-                        style: TextStyle(
+                        oCcy.format(widget.roomItem!.roomCost),
+                        style: const TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
                           color: Color(0xFF394960),
@@ -152,8 +170,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
+                  children: [
+                    const Text(
                       'Tiền điện',
                       style: TextStyle(
                         fontSize: 14,
@@ -162,8 +180,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       ),
                     ),
                     Text(
-                      '650,000',
-                      style: TextStyle(
+                      oCcy.format(widget.roomItem!.electricity! *
+                          (widget.roomItem!.newElectricNumber! - widget.roomItem!.oldElectricNumber!)),
+                      style: const TextStyle(
                         fontSize: 14,
                         height: 22 / 14,
                         color: Color(0xFF394960),
@@ -175,8 +194,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'Tiền nước',
                         style: TextStyle(
                           fontSize: 14,
@@ -185,8 +204,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        '100,000',
-                        style: TextStyle(
+                        oCcy.format(widget.roomItem!.water! *
+                            (widget.roomItem!.newWaterNumber! - widget.roomItem!.oldWaterNumber!)),
+                        style: const TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
                           color: Color(0xFF394960),
@@ -197,8 +217,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
+                  children: [
+                    const Text(
                       'Internet',
                       style: TextStyle(
                         fontSize: 14,
@@ -207,8 +227,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       ),
                     ),
                     Text(
-                      '100,000',
-                      style: TextStyle(
+                      oCcy.format(widget.roomItem!.internet),
+                      style: const TextStyle(
                         fontSize: 14,
                         height: 22 / 14,
                         color: Color(0xFF394960),
@@ -220,9 +240,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        'Xe đạp điện (nếu có)',
+                    children: [
+                      const Text(
+                        'Phí dịch vụ',
                         style: TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
@@ -230,8 +250,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        '0',
-                        style: TextStyle(
+                        oCcy.format(widget.roomItem!.otherService),
+                        style: const TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
                           color: Color(0xFF394960),
@@ -242,24 +262,48 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
-                      'Tổng cộng',
+                  children: [
+                    const Text(
+                      'Xe đạp điện (nếu có)',
                       style: TextStyle(
-                        fontSize: 16,
-                        height: 24 / 16,
+                        fontSize: 14,
+                        height: 22 / 14,
                         color: Color(0xFF6E87AA),
                       ),
                     ),
                     Text(
-                      '6,850,000',
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 24 / 16,
+                      oCcy.format(widget.roomItem!.vehicle),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 22 / 14,
                         color: Color(0xFF394960),
                       ),
                     ),
                   ],
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tổng cộng',
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 24 / 16,
+                          color: Color(0xFF6E87AA),
+                        ),
+                      ),
+                      Text(
+                        oCcy.format(widget.roomItem!.totalBill),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 24 / 16,
+                          color: Color(0xFF394960),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

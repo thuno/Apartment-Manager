@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -66,26 +67,43 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
   }
 
   Future<void> saveData() async {
-    setState(() {
-      isSaving = true;
-      controller = AnimationController(
-        vsync: this,
-        duration: const Duration(seconds: 1),
-      )..addListener(() {
-          if (mounted && isSaving) {
-            setState(() {});
-          }
-        });
-      controller!.repeat();
-    });
-    await RoomDA.editRoom(RoomDA.listRoom[currentIndex]).then((value) {
+    try {
       setState(() {
-        controller!.removeListener(() {});
-        isSaving = false;
-        isChange = false;
-        controller?.removeListener(() {});
+        isSaving = true;
+        controller = AnimationController(
+          vsync: this,
+          duration: const Duration(seconds: 1),
+        )..addListener(() {
+            if (mounted && isSaving) {
+              setState(() {});
+            }
+          });
+        controller!.repeat();
       });
-    });
+      await RoomDA.editRoom(RoomDA.listRoom[currentIndex]).then((value) {
+        setState(() {
+          controller!.removeListener(() {});
+          isSaving = false;
+          isChange = false;
+          controller?.removeListener(() {});
+        });
+        if (ScaffoldMessenger.of(context).mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+            'Lưu thông tin giá phòng thành công',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          )));
+        }
+      });
+    } catch (e) {
+      if (ScaffoldMessenger.of(context).mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+          'Lưu thông tin giá phòng không hành công',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        )));
+      }
+    }
   }
 
   @override
@@ -120,7 +138,95 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
             padding: const EdgeInsets.only(top: 12),
             child: InkWell(
               onTap: () {
-                Navigator.pop(context);
+                if (isChange) {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: IntrinsicHeight(
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Bạn có chắc chắn muốn thoát',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      height: 24 / 18,
+                                      color: Color(0xFF262626)),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 12),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFF2F5F8),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'Ở lại',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  height: 20 / 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF6E87AA)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF366AE2),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'Thoát',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  height: 20 / 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
               },
               child: const Icon(
                 Icons.chevron_left,
