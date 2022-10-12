@@ -20,6 +20,14 @@ class FireBaseDA {
     return listData;
   }
 
+  static Future<void> deleteCol(String collection) async {
+    CollectionReference collectionReference = FirebaseFirestore.instance.collection(collection);
+    QuerySnapshot snapshot = await collectionReference.get();
+    for (var element in snapshot.docs) {
+      await delete(collection, element.id);
+    }
+  }
+
   static Future<Map<String, dynamic>> getDocData(String collection, String docID) async {
     DocumentSnapshot docSnapshot = await FirebaseFirestore.instance.collection(collection).doc(docID).get();
     return jsonDecode(jsonEncode(docSnapshot.data()));

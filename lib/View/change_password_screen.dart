@@ -298,7 +298,7 @@ class _ChangePaswwordState extends State<ChangePaswword> with TickerProviderStat
                               if (ScaffoldMessenger.of(context).mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                     content: Text(
-                                  'Thay đổi mật khẩu không thành công',
+                                  'Thay đổi mật khẩu  không thành công',
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                                 )));
                               }

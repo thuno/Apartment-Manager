@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:project1/Module/room_item.dart';
+import 'package:project1/Module/bill_item.dart';
 import 'package:project1/View/payment_screen.dart';
 
 class BillDetailsScreen extends StatefulWidget {
-  final RoomItem? roomItem;
+  final BillItem? billItem;
   final int paymentStatus;
-  const BillDetailsScreen({super.key, this.roomItem, this.paymentStatus = 0});
+  final int payDay;
+  const BillDetailsScreen({super.key, this.billItem, this.paymentStatus = 0, this.payDay = 10});
 
   @override
   State<BillDetailsScreen> createState() => _BillDetailsScreenState();
@@ -16,12 +17,17 @@ class BillDetailsScreen extends StatefulWidget {
 
 class _BillDetailsScreenState extends State<BillDetailsScreen> {
   final oCcy = NumberFormat("#,##0", "en_US");
-  DateTime lastMonth = DateTime(DateTime.now().year, DateTime.now().month, 0);
+  DateTime timeOnBill = DateTime.now();
   int payDay = 1;
+  BillItem billItem = BillItem();
 
   @override
   void initState() {
-    payDay = int.parse(widget.roomItem!.dateStart!.split("/").first);
+    if (widget.billItem != null) {
+      billItem = widget.billItem!;
+      var listTime = widget.billItem!.name!.split("/");
+      timeOnBill = DateTime(int.parse(listTime.last), int.parse(listTime.first) + 1);
+    }
     super.initState();
   }
 
@@ -53,7 +59,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         title: Column(
           children: [
             Text(
-              'Chi tiết tiền phòng tháng ${lastMonth.month}',
+              'Chi tiết tiền phòng tháng ${billItem.name}',
               style: const TextStyle(
                 fontSize: 16,
                 height: 24 / 16,
@@ -63,7 +69,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
             Container(
               margin: const EdgeInsets.only(top: 8),
               child: Text(
-                'Tính đến ngày ${lastMonth.day}/${lastMonth.month < 10 ? "0${lastMonth.month}" : lastMonth.month}/${lastMonth.year}',
+                'Tính đến ngày ${timeOnBill.day}/${billItem.name}',
                 style: const TextStyle(
                   fontSize: 14,
                   height: 22 / 14,
@@ -102,7 +108,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Ngày nộp tiền $payDay/${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}/${DateTime.now().year}',
+                      'Ngày nộp tiền ${widget.payDay}/${timeOnBill.month < 10 ? "0${timeOnBill.month}" : timeOnBill.month}/${timeOnBill.year}',
                       style: const TextStyle(
                         fontSize: 12,
                         height: 16 / 12,
@@ -158,7 +164,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        oCcy.format(widget.roomItem!.roomCost),
+                        oCcy.format(billItem.roomCost ?? 0),
                         style: const TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
@@ -180,8 +186,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       ),
                     ),
                     Text(
-                      oCcy.format(widget.roomItem!.electricity! *
-                          (widget.roomItem!.newElectricNumber! - widget.roomItem!.oldElectricNumber!)),
+                      oCcy.format(billItem.electricity ??
+                          0 * (billItem.newElectricNumber ?? 0 - (billItem.oldElectricNumber ?? 0))),
                       style: const TextStyle(
                         fontSize: 14,
                         height: 22 / 14,
@@ -204,8 +210,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        oCcy.format(widget.roomItem!.water! *
-                            (widget.roomItem!.newWaterNumber! - widget.roomItem!.oldWaterNumber!)),
+                        oCcy.format(
+                            billItem.water ?? 0 * (billItem.newWaterNumber ?? 0 - (billItem.oldWaterNumber ?? 0))),
                         style: const TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
@@ -227,7 +233,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       ),
                     ),
                     Text(
-                      oCcy.format(widget.roomItem!.internet),
+                      oCcy.format(billItem.internet ?? 0),
                       style: const TextStyle(
                         fontSize: 14,
                         height: 22 / 14,
@@ -250,7 +256,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        oCcy.format(widget.roomItem!.otherService),
+                        oCcy.format(billItem.otherService ?? 0),
                         style: const TextStyle(
                           fontSize: 14,
                           height: 22 / 14,
@@ -272,7 +278,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       ),
                     ),
                     Text(
-                      oCcy.format(widget.roomItem!.vehicle),
+                      oCcy.format(billItem.vehicle ?? 0),
                       style: const TextStyle(
                         fontSize: 14,
                         height: 22 / 14,
@@ -295,7 +301,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                       ),
                       Text(
-                        oCcy.format(widget.roomItem!.totalBill),
+                        oCcy.format(billItem.totalBill),
                         style: const TextStyle(
                           fontSize: 16,
                           height: 24 / 16,

@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:project1/Module/bill_item.dart';
 import 'package:project1/View/bill_detail_screen.dart';
 
 class BillHistoryScreen extends StatefulWidget {
-  const BillHistoryScreen({super.key});
+  final String? roomName;
+  final int paymentStatus;
+  final int payDay;
+  const BillHistoryScreen({super.key, this.roomName, this.paymentStatus = 0, this.payDay = 10});
 
   @override
   State<BillHistoryScreen> createState() => _BillHistoryScreenState();
 }
 
 class _BillHistoryScreenState extends State<BillHistoryScreen> {
-  List listBll = [];
+  final oCcy = NumberFormat("#,##0", "en_US");
+  List<BillItem> listBll = [];
+
+  @override
+  void initState() {
+    BillDA.getListBill(widget.roomName!).then((_) {
+      setState(() {
+        listBll = BillDA.listBill;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +71,6 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
             padding: const EdgeInsets.only(top: 12),
             margin: const EdgeInsets.only(right: 16),
             child: InkWell(
-              // onTap: () {
-              //   Navigator.pop(context);
-              // },
               child: SvgPicture.asset(
                 'lib/Assets/filter.svg',
               ),
@@ -70,7 +83,7 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
         padding: const EdgeInsets.all(16),
         child: ListView.separated(
           physics: const BouncingScrollPhysics(),
-          itemCount: 6,
+          itemCount: listBll.length,
           itemBuilder: (context, index) {
             return Container(
               padding: const EdgeInsets.all(16),
@@ -80,18 +93,22 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children: [
                       Text(
-                        'Hạn nộp 10/8/2022',
-                        style: TextStyle(
+                        'Hạn nộp ${widget.payDay}/${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}/${DateTime.now().year}',
+                        style: const TextStyle(
                           fontSize: 12,
                           height: 16 / 12,
                           color: Color(0xFF6E87AA),
                         ),
                       ),
                       Text(
-                        'Sắp hết hạn',
-                        style: TextStyle(
+                        widget.paymentStatus == 0
+                            ? 'Đã thanh toán'
+                            : widget.paymentStatus == 2
+                                ? 'Trễ hạn'
+                                : 'Chưa thanh toán',
+                        style: const TextStyle(
                           fontSize: 12,
                           height: 16 / 12,
                           color: Color(0xFF6E87AA),
@@ -101,9 +118,9 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
                   ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: const Text(
-                      'Tiền phòng tháng 8/2022',
-                      style: TextStyle(
+                    child: Text(
+                      'Tiền phòng tháng ${listBll[index].name}',
+                      style: const TextStyle(
                         fontSize: 16,
                         height: 24 / 16,
                         fontWeight: FontWeight.w700,
@@ -112,9 +129,9 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
                     ),
                   ),
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
-                        TextSpan(
+                        const TextSpan(
                           text: 'Số tiền: ',
                           style: TextStyle(
                             fontSize: 14,
@@ -123,14 +140,14 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: '6,850,000',
-                          style: TextStyle(
+                          text: oCcy.format(listBll[index].totalBill),
+                          style: const TextStyle(
                             fontSize: 20,
                             height: 28 / 20,
                             color: Color(0xFF2EB553),
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: ' VNĐ',
                           style: TextStyle(
                             fontSize: 14,
@@ -146,10 +163,15 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
                     child: InkWell(
                       onTap: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const BillDetailsScreen(),
-                            ));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BillDetailsScreen(
+                              billItem: listBll[index],
+                              paymentStatus: index == (listBll.length - 1) ? widget.paymentStatus : 0,
+                              payDay: widget.payDay,
+                            ),
+                          ),
+                        );
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:project1/Module/bill_item.dart';
 import 'package:project1/Module/room_item.dart';
 
 class UpdateCost extends StatefulWidget {
@@ -30,25 +31,39 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
   int totalCost = 0;
   bool isSaving = false;
   bool isChange = false;
+  bool isAdd = false;
 
   int currentIndex = 0;
+  BillItem currentBill = BillItem();
 
   void selectRoom() {
-    editRoomCost.text = oCcy.format(RoomDA.listRoom[currentIndex].roomCost);
-    editOldElectric.text = '${RoomDA.listRoom[currentIndex].oldElectricNumber}';
-    editNewElectric.text = '${RoomDA.listRoom[currentIndex].newElectricNumber}';
-    editElectricCost.text = '${RoomDA.listRoom[currentIndex].electricity! / 1000}'.replaceAll(".0", "");
-    editTotalElectric.text = oCcy.format(RoomDA.listRoom[currentIndex].electricity! *
-        (RoomDA.listRoom[currentIndex].newElectricNumber! - RoomDA.listRoom[currentIndex].oldElectricNumber!));
-    editOldWater.text = '${RoomDA.listRoom[currentIndex].oldWaterNumber}';
-    editNewWater.text = '${RoomDA.listRoom[currentIndex].newWaterNumber}';
-    editWaterCost.text = '${RoomDA.listRoom[currentIndex].water! / 1000}'.replaceAll(".0", "");
-    editTotalWater.text = oCcy.format(RoomDA.listRoom[currentIndex].water! *
-        (RoomDA.listRoom[currentIndex].newWaterNumber! - RoomDA.listRoom[currentIndex].oldWaterNumber!));
-    editInternet.text = oCcy.format(RoomDA.listRoom[currentIndex].internet);
-    editOtherService.text = oCcy.format(RoomDA.listRoom[currentIndex].otherService);
-    editVehicle.text = oCcy.format(RoomDA.listRoom[currentIndex].vehicle);
-    totalCost = RoomDA.listRoom[currentIndex].totalBill;
+    if (RoomDA.listRoom[currentIndex].lastBill == null) {
+      RoomDA.listRoom[currentIndex].lastBill = BillItem.fromJson(BillDA.defaultBill.toJson());
+      if (RoomDA.listRoom[currentIndex].lastBillId != null) {
+        BillDA.getBillInfor(RoomDA.listRoom[currentIndex].lastBillId!, RoomDA.listRoom[currentIndex].name!)
+            .then((value) {
+          setState(() {
+            currentBill = value;
+            selectRoom();
+          });
+        });
+      }
+    }
+    currentBill = RoomDA.listRoom[currentIndex].lastBill!;
+    editRoomCost.text = oCcy.format(currentBill.roomCost);
+    editOldElectric.text = '${currentBill.oldElectricNumber}';
+    editNewElectric.text = '${currentBill.newElectricNumber}';
+    editElectricCost.text = '${currentBill.electricity! / 1000}'.replaceAll(".0", "");
+    editTotalElectric.text =
+        oCcy.format(currentBill.electricity! * (currentBill.newElectricNumber! - currentBill.oldElectricNumber!));
+    editOldWater.text = '${currentBill.oldWaterNumber}';
+    editNewWater.text = '${currentBill.newWaterNumber}';
+    editWaterCost.text = '${currentBill.water! / 1000}'.replaceAll(".0", "");
+    editTotalWater.text = oCcy.format(currentBill.water! * (currentBill.newWaterNumber! - currentBill.oldWaterNumber!));
+    editInternet.text = oCcy.format(currentBill.internet);
+    editOtherService.text = oCcy.format(currentBill.otherService);
+    editVehicle.text = oCcy.format(currentBill.vehicle);
+    totalCost = currentBill.totalBill;
   }
 
   void calcTotalCost() {
@@ -80,7 +95,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
           });
         controller!.repeat();
       });
-      await RoomDA.editRoom(RoomDA.listRoom[currentIndex]).then((value) {
+      await BillDA.editBill(currentBill, RoomDA.listRoom[currentIndex].name!).then((value) {
         setState(() {
           controller!.removeListener(() {});
           isSaving = false;
@@ -99,7 +114,52 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
       if (ScaffoldMessenger.of(context).mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text(
-          'Lưu thông tin giá phòng không hành công',
+          'Lưu thông tin giá phòng không thành công',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        )));
+      }
+    }
+  }
+
+  Future<void> addNewBill() async {
+    try {
+      setState(() {
+        isAdd = true;
+        isSaving = true;
+        controller = AnimationController(
+          vsync: this,
+          duration: const Duration(seconds: 1),
+        )..addListener(() {
+            if (mounted && isSaving) {
+              setState(() {});
+            }
+          });
+        controller!.repeat();
+      });
+      currentBill.name =
+          '${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}/${DateTime.now().year}';
+      await BillDA.addBill(currentBill, RoomDA.listRoom[currentIndex].name!).then((value) {
+        setState(() {
+          controller!.removeListener(() {});
+          isSaving = false;
+          isChange = false;
+          controller?.removeListener(() {});
+        });
+        if (ScaffoldMessenger.of(context).mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+            'Gửi thông tin hóa đơn phòng thành công',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          )));
+        }
+      });
+      RoomDA.listRoom[currentIndex].lastBillId = currentBill.id;
+      RoomDA.editRoom(RoomDA.listRoom[currentIndex]);
+    } catch (e) {
+      if (ScaffoldMessenger.of(context).mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+          'Gửi thông tin hóa đơn phòng không thành công',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         )));
       }
@@ -319,13 +379,13 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                       var newValue = formatMoney(editRoomCost.text);
                       setState(() {
                         if (newValue != null) {
-                          if (newValue != RoomDA.listRoom[currentIndex].roomCost) {
-                            RoomDA.listRoom[currentIndex].roomCost = newValue;
+                          if (newValue != currentBill.roomCost) {
+                            currentBill.roomCost = newValue;
                             calcTotalCost();
                             isChange = true;
                           }
                         } else {
-                          editRoomCost.text = oCcy.format(RoomDA.listRoom[currentIndex].roomCost);
+                          editRoomCost.text = oCcy.format(currentBill.roomCost);
                         }
                       });
                     }
@@ -371,8 +431,8 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                             var newValue = int.tryParse(editOldElectric.text);
                             setState(() {
                               if (newValue != null) {
-                                if (newValue != RoomDA.listRoom[currentIndex].oldElectricNumber) {
-                                  RoomDA.listRoom[currentIndex].oldElectricNumber = newValue;
+                                if (newValue != currentBill.oldElectricNumber) {
+                                  currentBill.oldElectricNumber = newValue;
                                   calcTotalCost();
                                   isChange = true;
                                   editTotalElectric.text = oCcy.format(
@@ -380,7 +440,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                           (int.tryParse(editNewElectric.text)! - newValue));
                                 }
                               } else {
-                                editOldElectric.text = '${RoomDA.listRoom[currentIndex].oldElectricNumber}';
+                                editOldElectric.text = '${currentBill.oldElectricNumber}';
                               }
                             });
                           }
@@ -416,8 +476,8 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                             var newValue = int.tryParse(editNewElectric.text);
                             setState(() {
                               if (newValue != null) {
-                                if (newValue != RoomDA.listRoom[currentIndex].newElectricNumber) {
-                                  RoomDA.listRoom[currentIndex].newElectricNumber = newValue;
+                                if (newValue != currentBill.newElectricNumber) {
+                                  currentBill.newElectricNumber = newValue;
                                   calcTotalCost();
                                   isChange = true;
                                   editTotalElectric.text = oCcy.format(
@@ -425,7 +485,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                           (newValue - int.tryParse(editOldElectric.text)!));
                                 }
                               } else {
-                                editNewElectric.text = '${RoomDA.listRoom[currentIndex].newElectricNumber}';
+                                editNewElectric.text = '${currentBill.newElectricNumber}';
                               }
                             });
                           }
@@ -469,16 +529,15 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                           var newValue = double.tryParse(editElectricCost.text);
                           setState(() {
                             if (newValue != null) {
-                              if ((newValue * 1000).toInt() != RoomDA.listRoom[currentIndex].electricity) {
-                                RoomDA.listRoom[currentIndex].electricity = (newValue * 1000).toInt();
+                              if ((newValue * 1000).toInt() != currentBill.electricity) {
+                                currentBill.electricity = (newValue * 1000).toInt();
                                 calcTotalCost();
                                 isChange = true;
                                 editTotalElectric.text = oCcy.format((newValue * 1000).toInt() *
                                     (int.tryParse(editNewElectric.text)! - int.tryParse(editOldElectric.text)!));
                               }
                             } else {
-                              editElectricCost.text =
-                                  '${RoomDA.listRoom[currentIndex].electricity! / 1000}'.replaceAll(".0", "");
+                              editElectricCost.text = '${currentBill.electricity! / 1000}'.replaceAll(".0", "");
                             }
                           });
                         }
@@ -573,8 +632,8 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                             var newValue = int.tryParse(editOldWater.text);
                             setState(() {
                               if (newValue != null) {
-                                if (newValue != RoomDA.listRoom[currentIndex].oldWaterNumber) {
-                                  RoomDA.listRoom[currentIndex].oldWaterNumber = newValue;
+                                if (newValue != currentBill.oldWaterNumber) {
+                                  currentBill.oldWaterNumber = newValue;
                                   calcTotalCost();
                                   isChange = true;
                                   editTotalWater.text = oCcy.format(
@@ -582,7 +641,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                           (int.tryParse(editNewWater.text)! - newValue));
                                 }
                               } else {
-                                editOldWater.text = '${RoomDA.listRoom[currentIndex].oldWaterNumber}';
+                                editOldWater.text = '${currentBill.oldWaterNumber}';
                               }
                             });
                           }
@@ -618,8 +677,8 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                             var newValue = int.tryParse(editNewWater.text);
                             setState(() {
                               if (newValue != null) {
-                                if (newValue != RoomDA.listRoom[currentIndex].newWaterNumber) {
-                                  RoomDA.listRoom[currentIndex].newWaterNumber = newValue;
+                                if (newValue != currentBill.newWaterNumber) {
+                                  currentBill.newWaterNumber = newValue;
                                   calcTotalCost();
                                   isChange = true;
                                   editTotalWater.text = oCcy.format(
@@ -627,7 +686,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                           (newValue - int.tryParse(editOldWater.text)!));
                                 }
                               } else {
-                                editNewWater.text = '${RoomDA.listRoom[currentIndex].newWaterNumber}';
+                                editNewWater.text = '${currentBill.newWaterNumber}';
                               }
                             });
                           }
@@ -671,16 +730,15 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                           var newValue = int.tryParse(editNewWater.text);
                           setState(() {
                             if (newValue != null) {
-                              if ((newValue * 1000).toInt() != RoomDA.listRoom[currentIndex].newWaterNumber) {
-                                RoomDA.listRoom[currentIndex].newWaterNumber = (newValue * 1000).toInt();
+                              if ((newValue * 1000).toInt() != currentBill.newWaterNumber) {
+                                currentBill.newWaterNumber = (newValue * 1000).toInt();
                                 calcTotalCost();
                                 isChange = true;
                                 editTotalWater.text = oCcy.format((newValue * 1000).toInt() *
                                     (int.tryParse(editNewWater.text)! - int.tryParse(editOldWater.text)!));
                               }
                             } else {
-                              editWaterCost.text =
-                                  '${RoomDA.listRoom[currentIndex].water! / 1000}'.replaceAll(".0", "");
+                              editWaterCost.text = '${currentBill.water! / 1000}'.replaceAll(".0", "");
                             }
                           });
                         }
@@ -779,13 +837,13 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                       var newValue = formatMoney(editInternet.text);
                       setState(() {
                         if (newValue != null) {
-                          if (newValue != RoomDA.listRoom[currentIndex].internet) {
-                            RoomDA.listRoom[currentIndex].internet = newValue;
+                          if (newValue != currentBill.internet) {
+                            currentBill.internet = newValue;
                             calcTotalCost();
                             isChange = true;
                           }
                         } else {
-                          editInternet.text = oCcy.format(RoomDA.listRoom[currentIndex].internet);
+                          editInternet.text = oCcy.format(currentBill.internet);
                         }
                       });
                     }
@@ -837,13 +895,13 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                       var newValue = formatMoney(editOtherService.text);
                       setState(() {
                         if (newValue != null) {
-                          if (newValue != RoomDA.listRoom[currentIndex].otherService) {
-                            RoomDA.listRoom[currentIndex].otherService = newValue;
+                          if (newValue != currentBill.otherService) {
+                            currentBill.otherService = newValue;
                             calcTotalCost();
                             isChange = true;
                           }
                         } else {
-                          editOtherService.text = oCcy.format(RoomDA.listRoom[currentIndex].otherService);
+                          editOtherService.text = oCcy.format(currentBill.otherService);
                         }
                       });
                     }
@@ -895,13 +953,13 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                       var newValue = formatMoney(editVehicle.text);
                       setState(() {
                         if (newValue != null) {
-                          if (newValue != RoomDA.listRoom[currentIndex].vehicle) {
-                            RoomDA.listRoom[currentIndex].vehicle = newValue;
+                          if (newValue != currentBill.vehicle) {
+                            currentBill.vehicle = newValue;
                             calcTotalCost();
                             isChange = true;
                           }
                         } else {
-                          editVehicle.text = oCcy.format(RoomDA.listRoom[currentIndex].vehicle);
+                          editVehicle.text = oCcy.format(currentBill.vehicle);
                         }
                       });
                     }
@@ -929,7 +987,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
         bottomNavigationBar: RoomDA.listRoom.isEmpty
             ? null
             : Container(
-                height: 116,
+                height: 168,
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                 child: Column(
@@ -964,17 +1022,17 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                       ),
                     ),
                     InkWell(
-                      onTap: isSaving && isChange ? null : saveData,
+                      onTap: (isSaving && isChange) || currentBill.id == null ? null : saveData,
                       child: Container(
                         height: 40,
                         width: double.infinity,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         decoration: BoxDecoration(
-                          color: isChange ? const Color(0xFF1890FF) : const Color(0xFFF5F5F5),
+                          color: isChange && currentBill.id != null ? const Color(0xFF1890FF) : const Color(0xFFF5F5F5),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: isSaving
+                        child: isSaving && !isAdd
                             ? SizedBox(
                                 height: 24,
                                 width: 24,
@@ -991,11 +1049,45 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                 style: TextStyle(
                                   fontSize: 14,
                                   height: 22 / 14,
+                                  color: isChange && currentBill.id != null ? Colors.white : const Color(0xFF8C8C8C),
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: isSaving && isChange ? null : addNewBill,
+                      child: Container(
+                        height: 40,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isChange ? const Color(0xFF1890FF) : const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: isSaving && isAdd
+                            ? SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: CircularProgressIndicator(
+                                    value: controller!.value,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                'Lưu và gửi hóa đơn tháng mới',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  height: 22 / 14,
                                   color: isChange ? Colors.white : const Color(0xFF8C8C8C),
                                 ),
                               ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

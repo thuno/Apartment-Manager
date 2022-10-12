@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project1/Module/payment_infor_item.dart';
 
 class PaymentScreen extends StatefulWidget {
   final bool isPage;
@@ -10,7 +11,17 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  List listImg = [];
+  List<PaymentItem> listPayment = [];
+
+  @override
+  void initState() {
+    PaymentDA.getListPayment().then((_) {
+      setState(() {
+        listPayment = PaymentDA.listPayment;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +76,81 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
               maxLines: 2,
             ),
-            for (var img in listImg)
+            for (var payment in listPayment)
               Container(
                 margin: const EdgeInsets.only(top: 16),
-                child: Image.network(img),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Ngân hàng thụ hưởng: ',
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 22 / 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF262626),
+                          ),
+                        ),
+                        Text(
+                          payment.bank!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 22 / 14,
+                            color: Color(0xFF262626),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Tên chủ tài khoản: ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 22 / 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF262626),
+                            ),
+                          ),
+                          Text(
+                            payment.userName!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              height: 22 / 14,
+                              color: Color(0xFF262626),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const Text(
+                          'Số tài khoản: ',
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 22 / 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF262626),
+                          ),
+                        ),
+                        Text(
+                          payment.stk!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 22 / 14,
+                            color: Color(0xFF262626),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (payment.qrPhoto != null) Image.network(payment.qrPhoto!),
+                  ],
+                ),
               ),
           ],
         ),

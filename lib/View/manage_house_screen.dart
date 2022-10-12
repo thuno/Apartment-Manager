@@ -7,8 +7,6 @@ import 'package:project1/Module/room_item.dart';
 import 'package:project1/View/room_infor_screen.dart';
 import 'package:project1/View/update_cost_screen.dart';
 
-import '../Module/user_item.dart';
-
 class MangeHouse extends StatefulWidget {
   const MangeHouse({super.key});
 
@@ -484,8 +482,10 @@ class _DialogCreateRoomState extends State<DialogCreateRoom> {
                         });
                       } else {
                         if (widget.isAdd) {
-                          RoomItem newRoom = RoomItem.fromJson(RoomDA.defaultRoom.toJson());
-                          newRoom.name = editName.text;
+                          RoomItem newRoom = RoomItem(
+                            name: editName.text,
+                            payementStatus: false,
+                          );
                           await RoomDA.addRoom(newRoom).then((value) => Navigator.pop(context));
                         } else {
                           if (editName.text != widget.roomItem?.name) {

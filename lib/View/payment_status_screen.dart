@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:project1/Module/bill_item.dart';
 import 'package:project1/Module/room_item.dart';
 
 class PaymentStatus extends StatefulWidget {
@@ -164,36 +166,47 @@ class _PaymentStatusState extends State<PaymentStatus> {
                           color: const Color(0xFF366AE2),
                         ),
                       ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: 'Số tiền: ',
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 22 / 14,
-                                color: Color(0xFF4B6281),
+                      StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection(BillDA.collection + RoomDA.listRoom[index].name!)
+                              .doc(RoomDA.listRoom[index].lastBillId)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            String totalBill = '0';
+                            if (snapshot.hasData) {
+                              totalBill = oCcy.format(BillItem.fromJson(snapshot.data!.data()!).totalBill);
+                            }
+                            return RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: 'Số tiền: ',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      height: 22 / 14,
+                                      color: Color(0xFF4B6281),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: totalBill,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      height: 22 / 14,
+                                      color: Color(0xFF2EB553),
+                                    ),
+                                  ),
+                                  const TextSpan(
+                                    text: ' VNĐ',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      height: 22 / 14,
+                                      color: Color(0xFF4B6281),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            TextSpan(
-                              text: oCcy.format(RoomDA.listRoom[index].totalBill),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                height: 22 / 14,
-                                color: Color(0xFF2EB553),
-                              ),
-                            ),
-                            const TextSpan(
-                              text: ' VNĐ',
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 22 / 14,
-                                color: Color(0xFF4B6281),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                            );
+                          }),
                     ],
                   ),
                 ],

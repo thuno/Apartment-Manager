@@ -1,98 +1,53 @@
 import 'package:project1/Firebase/database_store.dart';
+import 'package:project1/Module/bill_item.dart';
 import 'package:project1/Module/guest_infor_item.dart';
-import 'package:project1/Module/message_item.dart';
 import 'package:project1/Module/user_item.dart';
 
 class RoomItem {
   String? id;
   String? name;
   int? numberUser;
-  int? roomCost;
-  int? electricity;
-  int? oldElectricNumber;
-  int? newElectricNumber;
-  int? water;
-  int? oldWaterNumber;
-  int? newWaterNumber;
-  int? internet;
-  int? otherService;
-  int? vehicle;
   bool? payementStatus;
   int? deposit;
   String? dateStart;
   String? guestId;
-  late int totalBill;
+  String? lastBillId;
+  BillItem? lastBill;
 
   RoomItem({
     this.id,
     this.name,
     this.numberUser,
-    this.roomCost,
-    this.oldElectricNumber,
-    this.newElectricNumber,
-    this.electricity,
-    this.oldWaterNumber,
-    this.newWaterNumber,
-    this.water,
-    this.internet,
-    this.otherService,
-    this.vehicle,
     this.payementStatus,
     this.guestId,
     this.deposit,
     this.dateStart,
-  }) {
-    if (roomCost != null) {
-      totalBill = roomCost! +
-          electricity! * (newElectricNumber! - oldElectricNumber!) +
-          water! * (newWaterNumber! - oldWaterNumber!) +
-          internet! +
-          otherService! +
-          vehicle!;
-    } else {
-      totalBill = 0;
-    }
-  }
+    this.lastBillId,
+    this.lastBill,
+  });
 
   static RoomItem fromJson(Map<String, dynamic> json) {
     return RoomItem(
-        id: json['ID'],
-        name: json['Name'],
-        numberUser: json['NumberUser'] ?? 0,
-        roomCost: json['RoomCost'],
-        oldElectricNumber: json['OldElectricNumber'],
-        newElectricNumber: json['NewElectricNumber'],
-        electricity: json['electricity'],
-        oldWaterNumber: json['OldWaterNumber'],
-        newWaterNumber: json['NewWaterNumber'],
-        water: json['Water'],
-        internet: json['Internet'],
-        otherService: json['OtherService'],
-        vehicle: json['Vehicle'],
-        payementStatus: json['PayementStatus'] ?? false,
-        guestId: json['GuestID'],
-        deposit: json['Deposit'],
-        dateStart: json['DateStart']);
+      id: json['ID'],
+      name: json['Name'],
+      numberUser: json['NumberUser'] ?? 0,
+      payementStatus: json['PayementStatus'] ?? false,
+      guestId: json['GuestID'],
+      deposit: json['Deposit'],
+      dateStart: json['DateStart'],
+      lastBillId: json['LastBillID'],
+    );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'Name': name,
       'NumberUser': numberUser,
-      'RoomCost': roomCost,
-      'OldElectricNumber': oldElectricNumber,
-      'NewElectricNumber': newElectricNumber,
-      'electricity': electricity,
-      'OldWaterNumber': oldWaterNumber,
-      'NewWaterNumber': newWaterNumber,
-      'Water': water,
-      'Internet': internet,
-      'OtherService': otherService,
-      'Vehicle': vehicle,
       'PayementStatus': payementStatus,
       'GuestID': guestId,
       'Deposit': deposit,
       'DateStart': dateStart,
+      'LastBillID': lastBillId,
     };
   }
 }
@@ -100,18 +55,6 @@ class RoomItem {
 class RoomDA {
   static String collection = "Room";
   static List<RoomItem> listRoom = [];
-  static RoomItem defaultRoom = RoomItem(
-    roomCost: 6000000,
-    oldElectricNumber: 0,
-    newElectricNumber: 0,
-    electricity: 4000,
-    oldWaterNumber: 0,
-    newWaterNumber: 0,
-    water: 30000,
-    internet: 100000,
-    otherService: 100000,
-    vehicle: 0,
-  );
 
   static Future<RoomItem> getRoomInfor(String id) async {
     var resut = await FireBaseDA.getDocData(collection, id);
@@ -140,6 +83,7 @@ class RoomDA {
   static Future<void> deleteRoom(RoomItem roomItem) async {
     await FireBaseDA.delete(collection, roomItem.id!);
     await UserDA.deleteUser(UserDA.listAccount.firstWhere((e) => e.roomId == roomItem.id).id!);
+    await FireBaseDA.deleteCol(collection + roomItem.name!);
     if (roomItem.guestId != null) {
       await GuestInforDA.deleteInfor(GuestInforDA.guestInforList.firstWhere((e) => e.id == roomItem.guestId));
       await FireBaseDA.deleteFile(roomItem.name);
