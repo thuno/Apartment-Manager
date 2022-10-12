@@ -58,6 +58,10 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                           shape: BoxShape.circle,
                           color: Colors.grey,
                         ),
+                        child: Image.asset(
+                          'lib/Assets/Image demo.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Column(
                         children: [
