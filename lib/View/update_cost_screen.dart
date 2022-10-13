@@ -1045,7 +1045,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                 ),
                               )
                             : Text(
-                                'Lưu thông tin',
+                                'Lưu thông tin hóa đơn hiện tại',
                                 style: TextStyle(
                                   fontSize: 14,
                                   height: 22 / 14,
@@ -1079,7 +1079,7 @@ class _UpdateCostState extends State<UpdateCost> with TickerProviderStateMixin {
                                 ),
                               )
                             : Text(
-                                'Lưu và gửi hóa đơn tháng mới',
+                                'Gửi hóa đơn tháng mới',
                                 style: TextStyle(
                                   fontSize: 14,
                                   height: 22 / 14,
