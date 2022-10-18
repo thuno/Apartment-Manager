@@ -26,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   @override
   void initState() {
+    // lấy danh sách các tài khoản tồn tại trên firebase
     UserDA.getListAccount();
     super.initState();
   }
@@ -38,9 +39,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    // biến lưu kích tước màn hìn đt
     Size scr = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
+        // unfocus textfield
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
@@ -207,6 +210,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
                               if (saveLogin) {
                                 SharedPreferences store = await _prefs;
+                                // lưu id của người dùng ở lần đăng nhập này & thời gian đăng nhập
                                 await store.setString('timer', DateTime.now().toString());
                                 await store.setString('userID', user.roomId!);
                               }
@@ -214,6 +218,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                 (e) => e.roomId == user.roomId,
                                 orElse: () => UserItem(),
                               );
+                              // role = 0 là guest, role = 1 là admin
                               if (user.role == 0) {
                                 await RoomDA.getListRoom().then(
                                   (value) => Navigator.pushReplacement(
