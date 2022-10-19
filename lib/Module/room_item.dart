@@ -82,7 +82,10 @@ class RoomDA {
 
   static Future<void> deleteRoom(RoomItem roomItem) async {
     await FireBaseDA.delete(collection, roomItem.id!);
-    await UserDA.deleteUser(UserDA.listAccount.firstWhere((e) => e.roomId == roomItem.id).id!);
+    String? accountId = UserDA.listAccount.firstWhere((e) => e.roomId == roomItem.id, orElse: () => UserItem()).id;
+    if (accountId != null) {
+      await UserDA.deleteUser(accountId);
+    }
     await FireBaseDA.deleteCol(collection + roomItem.name!);
     if (roomItem.guestId != null) {
       await GuestInforDA.deleteInfor(GuestInforDA.guestInforList.firstWhere((e) => e.id == roomItem.guestId));
