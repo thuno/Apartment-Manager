@@ -71,6 +71,7 @@ class FireBaseDA {
       }
       return listPath;
     } catch (e) {
+      print(e);
       return [];
     }
   }

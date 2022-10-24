@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project1/Module/payment_infor_item.dart';
 
+import '../Firebase/database_store.dart';
+
 class PaymentScreen extends StatefulWidget {
   final bool isPage;
   const PaymentScreen({this.isPage = true, super.key});
@@ -15,10 +17,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   void initState() {
-    PaymentDA.getListPayment().then((_) {
-      setState(() {
-        listPayment = PaymentDA.listPayment;
-      });
+    PaymentDA.getListPayment().then((_) async {
+      listPayment = PaymentDA.listPayment;
+      for (var paymentItem in listPayment) {
+        var paths = await FireBaseDA.getFiles(paymentItem.qrPhoto);
+        paymentItem.qrPhotoLink = paths.single;
+      }
+      setState(() {});
     });
     super.initState();
   }
@@ -148,7 +153,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    if (payment.qrPhoto != null) Image.network(payment.qrPhoto!),
+                    if (payment.qrPhotoLink != null) Image.network(payment.qrPhotoLink!),
                   ],
                 ),
               ),

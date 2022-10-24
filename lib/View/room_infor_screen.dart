@@ -355,20 +355,21 @@ class _CommonInforTabState extends State<CommonInforTab> with TickerProviderStat
     deposit.text = oCcy.format(widget.roomItem?.deposit ?? 0);
     numberUser.text = widget.roomItem?.numberUser?.toString() ?? '0';
     startDate.text = widget.roomItem?.dateStart ?? '';
-
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant CommonInforTab oldWidget) {
     if (oldWidget.guestInfor != widget.guestInfor) {
-      userName.text = widget.guestInfor?.name ?? '';
-      birthDay.text = widget.guestInfor?.birthday ?? '';
-      address.text = widget.guestInfor?.address ?? '';
-      cccdNumber.text = widget.guestInfor?.ccNumber ?? '';
-      deposit.text = oCcy.format(widget.roomItem?.deposit ?? 0);
-      numberUser.text = widget.roomItem?.numberUser?.toString() ?? '0';
-      startDate.text = widget.roomItem?.dateStart ?? '';
+      setState(() {
+        userName.text = widget.guestInfor?.name ?? '';
+        birthDay.text = widget.guestInfor?.birthday ?? '';
+        address.text = widget.guestInfor?.address ?? '';
+        cccdNumber.text = widget.guestInfor?.ccNumber ?? '';
+        deposit.text = oCcy.format(widget.roomItem?.deposit ?? 0);
+        numberUser.text = widget.roomItem?.numberUser?.toString() ?? '0';
+        startDate.text = widget.roomItem?.dateStart ?? '';
+      });
     }
     super.didUpdateWidget(oldWidget);
   }

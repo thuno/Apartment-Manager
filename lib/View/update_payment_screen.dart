@@ -27,14 +27,17 @@ class _UpdatePaymentState extends State<UpdatePayment> with TickerProviderStateM
 
   @override
   void initState() {
-    PaymentDA.getListPayment().then((_) {
+    PaymentDA.getListPayment().then((_) async {
       if (PaymentDA.listPayment.isNotEmpty) {
-        setState(() {
-          paymentItem = PaymentDA.listPayment.first;
-          bank = paymentItem.bank;
-          editName.text = paymentItem.userName!;
-          editStk.text = paymentItem.stk!;
-        });
+        paymentItem = PaymentDA.listPayment.first;
+        var paths = await FireBaseDA.getFiles(paymentItem.qrPhoto);
+        if (paths.isNotEmpty) {
+          paymentItem.qrPhotoLink = paths.single;
+        }
+        bank = paymentItem.bank;
+        editName.text = paymentItem.userName!;
+        editStk.text = paymentItem.stk!;
+        setState(() {});
       }
     });
     super.initState();
@@ -416,7 +419,7 @@ class _UpdatePaymentState extends State<UpdatePayment> with TickerProviderStateM
                           child: Stack(
                             children: [
                               Image.network(
-                                paymentItem.qrPhoto!,
+                                paymentItem.qrPhotoLink ?? paymentItem.qrPhoto!,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Image.file(

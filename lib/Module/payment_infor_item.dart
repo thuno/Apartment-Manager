@@ -6,8 +6,9 @@ class PaymentItem {
   String? bank;
   String? qrPhoto;
   String? stk;
+  String? qrPhotoLink;
 
-  PaymentItem({this.id, this.userName, this.bank, this.qrPhoto, this.stk});
+  PaymentItem({this.id, this.userName, this.bank, this.qrPhoto, this.stk, this.qrPhotoLink});
 
   static PaymentItem fromJson(Map<String, dynamic> json) {
     return PaymentItem(
