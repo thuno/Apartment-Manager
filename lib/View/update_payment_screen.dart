@@ -60,12 +60,15 @@ class _UpdatePaymentState extends State<UpdatePayment> with TickerProviderStateM
       });
       if (paymentItem.id == null) {
         if (paymentItem.qrPhoto != null) {
-          final String fileName = paymentItem.qrPhoto!.split('\\').last;
-          await FireBaseDA.putFile(paymentItem.qrPhoto!, folder: 'Payment');
-          paymentItem.qrPhoto = 'Payment/$fileName';
+          String dataPath = await FireBaseDA.putFile(paymentItem.qrPhoto!, folder: 'Payment');
+          paymentItem.qrPhoto = dataPath;
         }
         await PaymentDA.add(paymentItem);
       } else {
+        if (paymentItem.qrPhoto == null || paymentItem.qrPhoto!.startsWith("Payment/")) {
+          String dataPath = await FireBaseDA.putFile(paymentItem.qrPhoto!, folder: 'Payment');
+          paymentItem.qrPhoto = dataPath;
+        }
         await PaymentDA.edit(paymentItem);
       }
       setState(() {
@@ -90,6 +93,12 @@ class _UpdatePaymentState extends State<UpdatePayment> with TickerProviderStateM
         )));
       }
     }
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 
   @override
@@ -465,7 +474,7 @@ class _UpdatePaymentState extends State<UpdatePayment> with TickerProviderStateM
             ),
             Builder(builder: (context) {
               bool isEnable = false;
-              if (editName.text.isNotEmpty && bank != null && editStk.text.isNotEmpty) {
+              if (editName.text.isNotEmpty && bank != null && editStk.text.isNotEmpty && isChange) {
                 isEnable = true;
               }
               return Container(

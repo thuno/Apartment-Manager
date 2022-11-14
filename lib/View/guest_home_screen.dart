@@ -418,7 +418,7 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                             builder: (context, snapshot) {
                               String totalBill = '0';
                               BillItem billItem = BillItem();
-                              if (snapshot.hasData) {
+                              if (snapshot.hasData && snapshot.data!.data() != null) {
                                 billItem = BillItem.fromJson(snapshot.data!.data()!);
                                 totalBill = oCcy.format(billItem.totalBill);
                               }

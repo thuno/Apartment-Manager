@@ -63,27 +63,31 @@ class FireBaseDA {
   static Future<List<String>> getFiles(String? folder) async {
     final Reference ref = FirebaseStorage.instance.ref(folder);
     try {
-      List<String> listPath = [];
-      ListResult listResult = await ref.listAll();
-      for (var e in listResult.items) {
-        String path = await e.getDownloadURL();
-        listPath.add(path);
+      if (folder!.endsWith('.jpg') || folder.endsWith('.png')) {
+        String path = await ref.getDownloadURL();
+        return [path];
+      } else {
+        List<String> listPath = [];
+        ListResult listResult = await ref.listAll();
+        for (var e in listResult.items) {
+          String path = await e.getDownloadURL();
+          listPath.add(path);
+        }
+        return listPath;
       }
-      return listPath;
     } catch (e) {
-      print(e);
       return [];
     }
   }
 
   // lưu file vào firebase storage
-  static Future<int> putFile(String filePath, {String? folder}) async {
+  static Future<String> putFile(String filePath, {String? folder}) async {
     try {
       final Reference ref = FirebaseStorage.instance.ref().child('${folder!}/${filePath.split("/").last}');
-      await ref.putFile(File(filePath));
-      return 200;
+      var x = await ref.putFile(File(filePath));
+      return x.ref.fullPath;
     } catch (e) {
-      return 404;
+      return "404";
     }
   }
 

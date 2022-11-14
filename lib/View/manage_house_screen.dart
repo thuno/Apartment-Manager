@@ -482,10 +482,7 @@ class _DialogCreateRoomState extends State<DialogCreateRoom> {
                         });
                       } else {
                         if (widget.isAdd) {
-                          RoomItem newRoom = RoomItem(
-                            name: editName.text,
-                            payementStatus: false,
-                          );
+                          RoomItem newRoom = RoomItem(name: editName.text, payementStatus: false, numberUser: 0);
                           await RoomDA.addRoom(newRoom).then((value) => Navigator.pop(context));
                         } else {
                           if (editName.text != widget.roomItem?.name) {

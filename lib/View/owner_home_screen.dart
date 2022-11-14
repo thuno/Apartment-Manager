@@ -84,7 +84,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     await IncomeDA.getHistory();
     if (mounted) {
       setState(() {
-        incomeLastMonth = IncomeDA.history.last;
+        if (IncomeDA.history.isNotEmpty) {
+          incomeLastMonth = IncomeDA.history.last;
+        }
       });
     }
   }
