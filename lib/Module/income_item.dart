@@ -41,8 +41,6 @@ class IncomeDA {
 
   static Future<void> getHistory() async {
     var listData = await FireBaseDA.getColData(collection);
-    print("check");
-    print(listData);
     history = listData.map((e) => IncomeItem.fromJson(e)).toList();
   }
 

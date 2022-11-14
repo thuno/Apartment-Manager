@@ -29,14 +29,14 @@ class BillItem {
     this.otherService,
     this.vehicle,
   }) {
-    if (roomCost != null) {
+    try {
       totalBill = roomCost! +
           electricity! * (newElectricNumber! - oldElectricNumber!) +
           water! * (newWaterNumber! - oldWaterNumber!) +
           internet! +
           otherService! +
           vehicle!;
-    } else {
+    } catch (e) {
       totalBill = 0;
     }
   }

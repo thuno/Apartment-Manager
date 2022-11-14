@@ -122,7 +122,7 @@ class _IncomeDetailsScreenState extends State<IncomeDetailsScreen> {
                           ),
                         ),
                         Builder(builder: (context) {
-                          var value = widget.incomeItem!.name!.replaceAll('tháng ', "").split('/');
+                          var value = widget.incomeItem!.name!.toLowerCase().replaceAll('tháng ', "").split('/');
                           var lastDayOfMonth = DateTime(int.parse(value.last), int.parse(value.first) + 1, 0).day;
                           return Text(
                             'Tính đến ngày $lastDayOfMonth/${widget.incomeItem!.name!.replaceAll("tháng ", "")}',

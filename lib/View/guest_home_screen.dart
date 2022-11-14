@@ -418,7 +418,7 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                             builder: (context, snapshot) {
                               String totalBill = '0';
                               BillItem billItem = BillItem();
-                              if (snapshot.hasData && snapshot.data!.data() != null) {
+                              if (snapshot.hasData && snapshot.data?.data() != null) {
                                 billItem = BillItem.fromJson(snapshot.data!.data()!);
                                 totalBill = oCcy.format(billItem.totalBill);
                               }
@@ -455,40 +455,41 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                                       ],
                                     ),
                                   ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 28),
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => BillDetailsScreen(
-                                                  billItem: billItem, paymentStatus: status, payDay: 10),
-                                            ));
-                                      },
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text(
-                                            'Xem chi tiết',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              height: 22 / 14,
-                                              color: Color(0xFF366AE2),
+                                  if (billItem.totalBill > 0)
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 28),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => BillDetailsScreen(
+                                                    billItem: billItem, paymentStatus: status, payDay: 10),
+                                              ));
+                                        },
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text(
+                                              'Xem chi tiết',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                height: 22 / 14,
+                                                color: Color(0xFF366AE2),
+                                              ),
                                             ),
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(left: 4, top: 2),
-                                            child: const Icon(
-                                              Icons.chevron_right,
-                                              size: 16,
-                                              color: Color(0xFF366AE2),
+                                            Container(
+                                              margin: const EdgeInsets.only(left: 4, top: 2),
+                                              child: const Icon(
+                                                Icons.chevron_right,
+                                                size: 16,
+                                                color: Color(0xFF366AE2),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ],
                               );
                             }),
