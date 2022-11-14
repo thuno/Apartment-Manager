@@ -182,7 +182,7 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                       child: const Icon(
                         Icons.power_settings_new_rounded,
                         size: 24,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                   ),
