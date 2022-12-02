@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   bool isLoading = false;
   AnimationController? controller;
   bool saveLogin = true;
+  bool isObscurePass = true;
 
   @override
   void initState() {
@@ -134,11 +135,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             });
                           },
                           focusNode: _focusPass,
-                          decoration: const InputDecoration(
+                          obscureText: isObscurePass,
+                          decoration: InputDecoration(
                             hintText: 'Mật khẩu',
                             isDense: true,
-                            contentPadding: EdgeInsets.all(16),
+                            contentPadding: const EdgeInsets.all(16),
                             border: InputBorder.none,
+                            suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    isObscurePass = !isObscurePass;
+                                  });
+                                },
+                                child: Icon(isObscurePass ? Icons.visibility_off : Icons.visibility)),
                           ),
                           style: const TextStyle(
                             fontSize: 16,
