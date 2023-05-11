@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "481368112120",
-    "project_id": "house-manager-b1c0f",
-    "storage_bucket": "house-manager-b1c0f.appspot.com"
+    "project_number": "652542810450",
+    "project_id": "housing-65859",
+    "storage_bucket": "housing-65859.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:481368112120:android:a19302a29bd41f3d11340d",
+        "mobilesdk_app_id": "1:652542810450:android:c10608b7ecd0d14fd9828b",
         "android_client_info": {
           "package_name": "com.example.house_manager"
         }
       },
       "oauth_client": [
         {
-          "client_id": "481368112120-qv4e48q658or1tkmbch6rmv4tj6r11cb.apps.googleusercontent.com",
+          "client_id": "652542810450-slhihv8r98bs9pf9aeiu4vpv7fdvn9pg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBoQZiMhBdu2CCRtQRJ19M3-LVeQkIEkHE"
+          "current_key": "AIzaSyB508vZAQWcmMcrru4AYaD0zALNLiD9Olo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "481368112120-qv4e48q658or1tkmbch6rmv4tj6r11cb.apps.googleusercontent.com",
+              "client_id": "652542810450-slhihv8r98bs9pf9aeiu4vpv7fdvn9pg.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
